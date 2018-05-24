@@ -1,5 +1,5 @@
-# import dash_composed
-import lib as dash_composed
+import dash_composed
+# import lib as dash_composed
 
 import dash
 import dash_html_components as html

@@ -7,7 +7,7 @@ const basicType = PropTypes.oneOfType([
   PropTypes.number,
   PropTypes.string,
   PropTypes.bool,
-  PropTypes.obj,
+  PropTypes.object,
   PropTypes.array
 ])
 
@@ -17,12 +17,12 @@ export default class ReactComponent extends Component {
         id: PropTypes.string,
         
         code: PropTypes.string.isRequired,
-        scope: PropTypes.obj,
+        scope: PropTypes.object,
         noInline: PropTypes.bool,
         
         containerEl: PropTypes.string,
-        containerProps: PropTypes.obj,
-        elementProps: PropTypes.obj,
+        containerProps: PropTypes.object,
+        elementProps: PropTypes.object,
         ignoredProps: PropTypes.array,
         
         /**
@@ -98,7 +98,6 @@ export default class ReactComponent extends Component {
       ])
 
       if (equals(nextState, this.state) && all(isPropEqual)(propsToCheck)) {
-        console.log(this.props.id)
         return false;
       }
         
