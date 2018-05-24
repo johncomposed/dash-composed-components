@@ -1,0 +1,5 @@
+include dash_composed/bundle.js
+include dash_composed/bundle.js.map
+include dash_composed/metadata.json
+include README.md
+include LICENSE.md
