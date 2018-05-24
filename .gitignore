@@ -1,0 +1,15 @@
+tmp
+__pycache__
+build/
+coverage/
+dist/
+lib/
+lib/bundle.js*
+node_modules/
+.npm
+vv/
+venv/
+*.pyc
+*.egg-info
+*.log
+.DS_Store
