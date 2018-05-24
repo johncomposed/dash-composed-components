@@ -12,14 +12,15 @@ _components = _dash.development.component_loader.load_components(
 
 _this_module = _sys.modules[__name__]
 
+# "external_url": (
+#     "https://unpkg.com/dash-composed@{}"
+#     "/dash_composed/bundle.js"
+# ).format(__version__),
 
 _js_dist = [
     {
         "relative_package_path": "bundle.js",
-        "external_url": (
-            "https://unpkg.com/dash-composed@{}"
-            "/dash_composed/bundle.js"
-        ).format(__version__),
+        "external_url": "https://cdn.rawgit.com/johncomposed/dash-composed-components/eab3178b/dash_composed/bundle.js",
         "namespace": "dash_composed"
     }
 ]
