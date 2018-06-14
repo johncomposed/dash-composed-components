@@ -1173,12 +1173,16 @@ this["dash_composed"] =
 	var generateElement = _transpile.generateElement;
 	var renderElementAsync = _transpile.renderElementAsync;
 	
-	var _ramda = __webpack_require__(/*! ramda */ 23);
+	var _ramda = __webpack_require__(/*! ramda */ 25);
 	
 	var all = _ramda.all;
 	var equals = _ramda.equals;
 	var omit = _ramda.omit;
 	var without = _ramda.without;
+	
+	var _factory = __webpack_require__(/*! react-plotly.js/factory */ 344);
+	
+	var createPlotlyComponent = _interopRequireDefault(_factory).default;
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1188,7 +1192,11 @@ this["dash_composed"] =
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	var Plotly = createPlotlyComponent(window.Plotly);
+	
 	var basicType = PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.bool, PropTypes.object, PropTypes.array]);
+	
+	var reactEvents = ['onCopy', 'onCut', 'onPaste', 'onCompositionEnd', 'onCompositionStart', 'onCompositionUpdate', 'onKeyDown', 'onKeyPress', 'onKeyUp', 'onFocus', 'onBlur', 'onChange', 'onInput', 'onInvalid', 'onSubmit', 'onClick', 'onContextMenu', 'onDoubleClick', 'onDrag', 'onDragEnd', 'onDragEnter', 'onDragExit', 'onDragLeave', 'onDragOver', 'onDragStart', 'onDrop', 'onMouseDown', 'onMouseEnter', 'onMouseLeave', 'onMouseMove', 'onMouseOut', 'onMouseOver', 'onMouseUp', 'onPointerDown', 'onPointerMove', 'onPointerUp', 'onPointerCancel', 'onGotPointerCapture', 'onLostPointerCapture', 'onPointerEnter', 'onPointerLeave', 'onPointerOver', 'onPointerOut', 'onSelect', 'onTouchCancel', 'onTouchEnd', 'onTouchMove', 'onTouchStart', 'onScroll', 'onAbort', 'onCanPlay', 'onCanPlayThrough', 'onDurationChange', 'onEmptied', 'onEncrypted', 'onEnded', 'onError', 'onLoadedData', 'onLoadedMetadata', 'onLoadStart', 'onPause', 'onPlay', 'onPlaying', 'onProgress', 'onRateChange', 'onSeeked', 'onSeeking', 'onStalled', 'onSuspend', 'onTimeUpdate', 'onVolumeChange', 'onWaiting', 'onWheel', 'onLoad', 'onError', 'onAnimationStart', 'onAnimationEnd', 'onAnimationIteration', 'onTransitionEnd', 'onToggle'];
 	
 	var ReactComponent = function (_Component) {
 	  _inherits(ReactComponent, _Component);
@@ -1200,6 +1208,7 @@ this["dash_composed"] =
 	
 	    _this.state = { code: props.code };
 	    _this.setProps = _this.setProps.bind(_this);
+	    _this.fireEvent = _this.fireEvent.bind(_this);
 	    return _this;
 	  }
 	
@@ -1213,8 +1222,9 @@ this["dash_composed"] =
 	          scope = _props.scope,
 	          noInline = _props.noInline;
 	
-	      // Transpilation arguments
 	
+	      scope['Plotly'] = Plotly;
+	      // Transpilation arguments
 	      var input = { code: code, scope: scope };
 	
 	      var errorCallback = function errorCallback(err) {
@@ -1249,7 +1259,6 @@ this["dash_composed"] =
 	      var propsToCheck = without(this.props.ignoredProps, [
 	      // 'scope', 'code', 
 	      "containerProps", "elementProps", "options", "layout", "data", "data2", "value", "value2"]);
-	      console.log(this.props.id);
 	
 	      if (equals(nextState, this.state) && all(isPropEqual)(propsToCheck)) {
 	        return false;
@@ -1262,6 +1271,13 @@ this["dash_composed"] =
 	    value: function setProps(newProps) {
 	      if (this.props.setProps) {
 	        this.props.setProps(newProps);
+	      }
+	    }
+	  }, {
+	    key: 'fireEvent',
+	    value: function fireEvent(eventobj) {
+	      if (this.props.fireEvent) {
+	        this.props.fireEvent(eventobj);
 	      }
 	    }
 	  }, {
@@ -1284,6 +1300,7 @@ this["dash_composed"] =
 	          value2 = _props2.value2;
 	
 	      var setProps = this.setProps;
+	      var fireEvent = this.fireEvent;
 	
 	      var El = containerEl || 'div';
 	      var Element = this.state.element;
@@ -1292,7 +1309,7 @@ this["dash_composed"] =
 	        El,
 	        _extends({ id: id }, containerProps),
 	        Element && React.createElement(Element, _extends({}, elementProps, {
-	          options: options, layout: layout, data: data, data2: data2, value: value, value2: value2, setProps: setProps
+	          options: options, layout: layout, data: data, data2: data2, value: value, value2: value2, setProps: setProps, fireEvent: fireEvent
 	        }))
 	      );
 	    }
@@ -1325,7 +1342,13 @@ this["dash_composed"] =
 	  data: basicType,
 	  data2: basicType,
 	  value: basicType,
-	  value2: basicType
+	  value2: basicType,
+	
+	  /**
+	   * Dash-assigned callback that gets fired when the input changes.
+	   */
+	  fireEvent: PropTypes.func,
+	  dashEvents: PropTypes.oneOf(reactEvents)
 	
 	};
 	ReactComponent.defaultProps = {
@@ -1366,11 +1389,11 @@ this["dash_composed"] =
 	
 	var transform = _interopRequireDefault(_transform).default;
 	
-	var _errorBoundary = __webpack_require__(/*! ./errorBoundary */ 342);
+	var _errorBoundary = __webpack_require__(/*! ./errorBoundary */ 23);
 	
 	var errorBoundary = _interopRequireDefault(_errorBoundary).default;
 	
-	var _evalCode = __webpack_require__(/*! ./evalCode */ 343);
+	var _evalCode = __webpack_require__(/*! ./evalCode */ 24);
 	
 	var evalCode = _interopRequireDefault(_evalCode).default;
 	
@@ -1425,21 +1448,16 @@ this["dash_composed"] =
 	
 	var _transform = _buble.transform;
 	
-	__webpack_require__(/*! ramda */ 23);
 	
-	// export const _poly = { assign }
-	
-	/*
-	For my purposes, I don't need the object assign polyfill
-	*/
 	var opts = {
-	  // objectAssign: '_poly.assign',
+	  objectAssign: 'Object.assign',
 	  transforms: {
 	    dangerousForOf: true,
 	    dangerousTaggedTemplateString: true
 	  }
-	};
-	// import assign from 'core-js/fn/object/assign'
+	}; /*
+	   For my purposes, I don't need the object assign polyfill
+	   */
 	
 	exports.default = function (code) {
 	  return _transform(code, opts).code;
@@ -20410,267 +20428,360 @@ this["dash_composed"] =
 
 /***/ },
 /* 23 */
+/*!************************************!*\
+  !*** ./transpile/errorBoundary.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 2);
+	
+	var React = _interopRequireDefault(_react).default;
+	
+	var Component = _react.Component;
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var errorBoundary = function errorBoundary(Element, errorCallback) {
+	  return function (_React$Component) {
+	    _inherits(ErrorBoundary, _React$Component);
+	
+	    function ErrorBoundary() {
+	      _classCallCheck(this, ErrorBoundary);
+	
+	      return _possibleConstructorReturn(this, (ErrorBoundary.__proto__ || Object.getPrototypeOf(ErrorBoundary)).apply(this, arguments));
+	    }
+	
+	    _createClass(ErrorBoundary, [{
+	      key: 'componentDidCatch',
+	      value: function componentDidCatch(error) {
+	        errorCallback(error);
+	      }
+	    }, {
+	      key: 'render',
+	      value: function render() {
+	        return typeof Element === 'function' ? React.createElement(Element, this.props) : Element;
+	      }
+	    }]);
+	
+	    return ErrorBoundary;
+	  }(React.Component);
+	};
+	
+	exports.default = errorBoundary;
+
+/***/ },
+/* 24 */
+/*!*******************************!*\
+  !*** ./transpile/evalCode.js ***!
+  \*******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _react = __webpack_require__(/*! react */ 2);
+	
+	var React = _interopRequireDefault(_react).default;
+	
+	var _transform = __webpack_require__(/*! ./transform */ 13);
+	
+	var _poly = _transform._poly;
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	
+	var evalCode = function evalCode(code, scope) {
+	  var scopeKeys = Object.keys(scope);
+	  var scopeValues = scopeKeys.map(function (key) {
+	    return scope[key];
+	  });
+	  var res = new (Function.prototype.bind.apply(Function, [null].concat(['_poly', 'React'], _toConsumableArray(scopeKeys), [code])))();
+	  return res.apply(undefined, [_poly, React].concat(_toConsumableArray(scopeValues)));
+	};
+	
+	exports.default = evalCode;
+
+/***/ },
+/* 25 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/index.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = {};
-	module.exports.F = /*#__PURE__*/__webpack_require__(/*! ./F */ 24);
-	module.exports.T = /*#__PURE__*/__webpack_require__(/*! ./T */ 28);
-	module.exports.__ = /*#__PURE__*/__webpack_require__(/*! ./__ */ 29);
-	module.exports.add = /*#__PURE__*/__webpack_require__(/*! ./add */ 30);
-	module.exports.addIndex = /*#__PURE__*/__webpack_require__(/*! ./addIndex */ 32);
-	module.exports.adjust = /*#__PURE__*/__webpack_require__(/*! ./adjust */ 37);
-	module.exports.all = /*#__PURE__*/__webpack_require__(/*! ./all */ 39);
-	module.exports.allPass = /*#__PURE__*/__webpack_require__(/*! ./allPass */ 46);
-	module.exports.always = /*#__PURE__*/__webpack_require__(/*! ./always */ 25);
-	module.exports.and = /*#__PURE__*/__webpack_require__(/*! ./and */ 63);
-	module.exports.any = /*#__PURE__*/__webpack_require__(/*! ./any */ 64);
-	module.exports.anyPass = /*#__PURE__*/__webpack_require__(/*! ./anyPass */ 66);
-	module.exports.ap = /*#__PURE__*/__webpack_require__(/*! ./ap */ 67);
-	module.exports.aperture = /*#__PURE__*/__webpack_require__(/*! ./aperture */ 68);
-	module.exports.append = /*#__PURE__*/__webpack_require__(/*! ./append */ 71);
-	module.exports.apply = /*#__PURE__*/__webpack_require__(/*! ./apply */ 72);
-	module.exports.applySpec = /*#__PURE__*/__webpack_require__(/*! ./applySpec */ 73);
-	module.exports.applyTo = /*#__PURE__*/__webpack_require__(/*! ./applyTo */ 75);
-	module.exports.ascend = /*#__PURE__*/__webpack_require__(/*! ./ascend */ 76);
-	module.exports.assoc = /*#__PURE__*/__webpack_require__(/*! ./assoc */ 77);
-	module.exports.assocPath = /*#__PURE__*/__webpack_require__(/*! ./assocPath */ 78);
-	module.exports.binary = /*#__PURE__*/__webpack_require__(/*! ./binary */ 81);
-	module.exports.bind = /*#__PURE__*/__webpack_require__(/*! ./bind */ 55);
-	module.exports.both = /*#__PURE__*/__webpack_require__(/*! ./both */ 83);
-	module.exports.call = /*#__PURE__*/__webpack_require__(/*! ./call */ 87);
-	module.exports.chain = /*#__PURE__*/__webpack_require__(/*! ./chain */ 89);
-	module.exports.clamp = /*#__PURE__*/__webpack_require__(/*! ./clamp */ 94);
-	module.exports.clone = /*#__PURE__*/__webpack_require__(/*! ./clone */ 95);
-	module.exports.comparator = /*#__PURE__*/__webpack_require__(/*! ./comparator */ 99);
-	module.exports.complement = /*#__PURE__*/__webpack_require__(/*! ./complement */ 100);
-	module.exports.compose = /*#__PURE__*/__webpack_require__(/*! ./compose */ 102);
-	module.exports.composeK = /*#__PURE__*/__webpack_require__(/*! ./composeK */ 109);
-	module.exports.composeP = /*#__PURE__*/__webpack_require__(/*! ./composeP */ 110);
-	module.exports.concat = /*#__PURE__*/__webpack_require__(/*! ./concat */ 113);
-	module.exports.cond = /*#__PURE__*/__webpack_require__(/*! ./cond */ 132);
-	module.exports.construct = /*#__PURE__*/__webpack_require__(/*! ./construct */ 133);
-	module.exports.constructN = /*#__PURE__*/__webpack_require__(/*! ./constructN */ 134);
-	module.exports.contains = /*#__PURE__*/__webpack_require__(/*! ./contains */ 135);
-	module.exports.converge = /*#__PURE__*/__webpack_require__(/*! ./converge */ 136);
-	module.exports.countBy = /*#__PURE__*/__webpack_require__(/*! ./countBy */ 137);
-	module.exports.curry = /*#__PURE__*/__webpack_require__(/*! ./curry */ 88);
-	module.exports.curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
-	module.exports.dec = /*#__PURE__*/__webpack_require__(/*! ./dec */ 140);
-	module.exports.defaultTo = /*#__PURE__*/__webpack_require__(/*! ./defaultTo */ 141);
-	module.exports.descend = /*#__PURE__*/__webpack_require__(/*! ./descend */ 142);
-	module.exports.difference = /*#__PURE__*/__webpack_require__(/*! ./difference */ 143);
-	module.exports.differenceWith = /*#__PURE__*/__webpack_require__(/*! ./differenceWith */ 144);
-	module.exports.dissoc = /*#__PURE__*/__webpack_require__(/*! ./dissoc */ 145);
-	module.exports.dissocPath = /*#__PURE__*/__webpack_require__(/*! ./dissocPath */ 146);
-	module.exports.divide = /*#__PURE__*/__webpack_require__(/*! ./divide */ 149);
-	module.exports.drop = /*#__PURE__*/__webpack_require__(/*! ./drop */ 150);
-	module.exports.dropLast = /*#__PURE__*/__webpack_require__(/*! ./dropLast */ 152);
-	module.exports.dropLastWhile = /*#__PURE__*/__webpack_require__(/*! ./dropLastWhile */ 157);
-	module.exports.dropRepeats = /*#__PURE__*/__webpack_require__(/*! ./dropRepeats */ 160);
-	module.exports.dropRepeatsWith = /*#__PURE__*/__webpack_require__(/*! ./dropRepeatsWith */ 162);
-	module.exports.dropWhile = /*#__PURE__*/__webpack_require__(/*! ./dropWhile */ 165);
-	module.exports.either = /*#__PURE__*/__webpack_require__(/*! ./either */ 167);
-	module.exports.empty = /*#__PURE__*/__webpack_require__(/*! ./empty */ 169);
-	module.exports.endsWith = /*#__PURE__*/__webpack_require__(/*! ./endsWith */ 170);
-	module.exports.eqBy = /*#__PURE__*/__webpack_require__(/*! ./eqBy */ 172);
-	module.exports.eqProps = /*#__PURE__*/__webpack_require__(/*! ./eqProps */ 173);
-	module.exports.equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 118);
-	module.exports.evolve = /*#__PURE__*/__webpack_require__(/*! ./evolve */ 174);
-	module.exports.filter = /*#__PURE__*/__webpack_require__(/*! ./filter */ 128);
-	module.exports.find = /*#__PURE__*/__webpack_require__(/*! ./find */ 175);
-	module.exports.findIndex = /*#__PURE__*/__webpack_require__(/*! ./findIndex */ 177);
-	module.exports.findLast = /*#__PURE__*/__webpack_require__(/*! ./findLast */ 179);
-	module.exports.findLastIndex = /*#__PURE__*/__webpack_require__(/*! ./findLastIndex */ 181);
-	module.exports.flatten = /*#__PURE__*/__webpack_require__(/*! ./flatten */ 183);
-	module.exports.flip = /*#__PURE__*/__webpack_require__(/*! ./flip */ 184);
-	module.exports.forEach = /*#__PURE__*/__webpack_require__(/*! ./forEach */ 185);
-	module.exports.forEachObjIndexed = /*#__PURE__*/__webpack_require__(/*! ./forEachObjIndexed */ 186);
-	module.exports.fromPairs = /*#__PURE__*/__webpack_require__(/*! ./fromPairs */ 187);
-	module.exports.groupBy = /*#__PURE__*/__webpack_require__(/*! ./groupBy */ 188);
-	module.exports.groupWith = /*#__PURE__*/__webpack_require__(/*! ./groupWith */ 189);
-	module.exports.gt = /*#__PURE__*/__webpack_require__(/*! ./gt */ 190);
-	module.exports.gte = /*#__PURE__*/__webpack_require__(/*! ./gte */ 191);
-	module.exports.has = /*#__PURE__*/__webpack_require__(/*! ./has */ 192);
-	module.exports.hasIn = /*#__PURE__*/__webpack_require__(/*! ./hasIn */ 193);
-	module.exports.head = /*#__PURE__*/__webpack_require__(/*! ./head */ 194);
-	module.exports.identical = /*#__PURE__*/__webpack_require__(/*! ./identical */ 123);
-	module.exports.identity = /*#__PURE__*/__webpack_require__(/*! ./identity */ 195);
-	module.exports.ifElse = /*#__PURE__*/__webpack_require__(/*! ./ifElse */ 197);
-	module.exports.inc = /*#__PURE__*/__webpack_require__(/*! ./inc */ 198);
-	module.exports.indexBy = /*#__PURE__*/__webpack_require__(/*! ./indexBy */ 199);
-	module.exports.indexOf = /*#__PURE__*/__webpack_require__(/*! ./indexOf */ 200);
-	module.exports.init = /*#__PURE__*/__webpack_require__(/*! ./init */ 201);
-	module.exports.innerJoin = /*#__PURE__*/__webpack_require__(/*! ./innerJoin */ 202);
-	module.exports.insert = /*#__PURE__*/__webpack_require__(/*! ./insert */ 203);
-	module.exports.insertAll = /*#__PURE__*/__webpack_require__(/*! ./insertAll */ 204);
-	module.exports.intersection = /*#__PURE__*/__webpack_require__(/*! ./intersection */ 205);
-	module.exports.intersperse = /*#__PURE__*/__webpack_require__(/*! ./intersperse */ 209);
-	module.exports.into = /*#__PURE__*/__webpack_require__(/*! ./into */ 210);
-	module.exports.invert = /*#__PURE__*/__webpack_require__(/*! ./invert */ 215);
-	module.exports.invertObj = /*#__PURE__*/__webpack_require__(/*! ./invertObj */ 216);
-	module.exports.invoker = /*#__PURE__*/__webpack_require__(/*! ./invoker */ 217);
-	module.exports.is = /*#__PURE__*/__webpack_require__(/*! ./is */ 218);
-	module.exports.isEmpty = /*#__PURE__*/__webpack_require__(/*! ./isEmpty */ 219);
-	module.exports.isNil = /*#__PURE__*/__webpack_require__(/*! ./isNil */ 80);
-	module.exports.join = /*#__PURE__*/__webpack_require__(/*! ./join */ 220);
-	module.exports.juxt = /*#__PURE__*/__webpack_require__(/*! ./juxt */ 221);
-	module.exports.keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 57);
-	module.exports.keysIn = /*#__PURE__*/__webpack_require__(/*! ./keysIn */ 222);
-	module.exports.last = /*#__PURE__*/__webpack_require__(/*! ./last */ 163);
-	module.exports.lastIndexOf = /*#__PURE__*/__webpack_require__(/*! ./lastIndexOf */ 223);
-	module.exports.length = /*#__PURE__*/__webpack_require__(/*! ./length */ 224);
-	module.exports.lens = /*#__PURE__*/__webpack_require__(/*! ./lens */ 226);
-	module.exports.lensIndex = /*#__PURE__*/__webpack_require__(/*! ./lensIndex */ 227);
-	module.exports.lensPath = /*#__PURE__*/__webpack_require__(/*! ./lensPath */ 228);
-	module.exports.lensProp = /*#__PURE__*/__webpack_require__(/*! ./lensProp */ 229);
-	module.exports.lift = /*#__PURE__*/__webpack_require__(/*! ./lift */ 85);
-	module.exports.liftN = /*#__PURE__*/__webpack_require__(/*! ./liftN */ 86);
-	module.exports.lt = /*#__PURE__*/__webpack_require__(/*! ./lt */ 230);
-	module.exports.lte = /*#__PURE__*/__webpack_require__(/*! ./lte */ 231);
-	module.exports.map = /*#__PURE__*/__webpack_require__(/*! ./map */ 49);
-	module.exports.mapAccum = /*#__PURE__*/__webpack_require__(/*! ./mapAccum */ 232);
-	module.exports.mapAccumRight = /*#__PURE__*/__webpack_require__(/*! ./mapAccumRight */ 233);
-	module.exports.mapObjIndexed = /*#__PURE__*/__webpack_require__(/*! ./mapObjIndexed */ 234);
-	module.exports.match = /*#__PURE__*/__webpack_require__(/*! ./match */ 235);
-	module.exports.mathMod = /*#__PURE__*/__webpack_require__(/*! ./mathMod */ 236);
-	module.exports.max = /*#__PURE__*/__webpack_require__(/*! ./max */ 47);
-	module.exports.maxBy = /*#__PURE__*/__webpack_require__(/*! ./maxBy */ 237);
-	module.exports.mean = /*#__PURE__*/__webpack_require__(/*! ./mean */ 238);
-	module.exports.median = /*#__PURE__*/__webpack_require__(/*! ./median */ 240);
-	module.exports.memoize = /*#__PURE__*/__webpack_require__(/*! ./memoize */ 241);
-	module.exports.memoizeWith = /*#__PURE__*/__webpack_require__(/*! ./memoizeWith */ 242);
-	module.exports.merge = /*#__PURE__*/__webpack_require__(/*! ./merge */ 243);
-	module.exports.mergeAll = /*#__PURE__*/__webpack_require__(/*! ./mergeAll */ 244);
-	module.exports.mergeDeepLeft = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepLeft */ 245);
-	module.exports.mergeDeepRight = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepRight */ 248);
-	module.exports.mergeDeepWith = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepWith */ 249);
-	module.exports.mergeDeepWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepWithKey */ 246);
-	module.exports.mergeWith = /*#__PURE__*/__webpack_require__(/*! ./mergeWith */ 250);
-	module.exports.mergeWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeWithKey */ 247);
-	module.exports.min = /*#__PURE__*/__webpack_require__(/*! ./min */ 251);
-	module.exports.minBy = /*#__PURE__*/__webpack_require__(/*! ./minBy */ 252);
-	module.exports.modulo = /*#__PURE__*/__webpack_require__(/*! ./modulo */ 253);
-	module.exports.multiply = /*#__PURE__*/__webpack_require__(/*! ./multiply */ 254);
-	module.exports.nAry = /*#__PURE__*/__webpack_require__(/*! ./nAry */ 82);
-	module.exports.negate = /*#__PURE__*/__webpack_require__(/*! ./negate */ 255);
-	module.exports.none = /*#__PURE__*/__webpack_require__(/*! ./none */ 256);
-	module.exports.not = /*#__PURE__*/__webpack_require__(/*! ./not */ 101);
-	module.exports.nth = /*#__PURE__*/__webpack_require__(/*! ./nth */ 164);
-	module.exports.nthArg = /*#__PURE__*/__webpack_require__(/*! ./nthArg */ 257);
-	module.exports.o = /*#__PURE__*/__webpack_require__(/*! ./o */ 258);
-	module.exports.objOf = /*#__PURE__*/__webpack_require__(/*! ./objOf */ 214);
-	module.exports.of = /*#__PURE__*/__webpack_require__(/*! ./of */ 259);
-	module.exports.omit = /*#__PURE__*/__webpack_require__(/*! ./omit */ 261);
-	module.exports.once = /*#__PURE__*/__webpack_require__(/*! ./once */ 262);
-	module.exports.or = /*#__PURE__*/__webpack_require__(/*! ./or */ 168);
-	module.exports.over = /*#__PURE__*/__webpack_require__(/*! ./over */ 263);
-	module.exports.pair = /*#__PURE__*/__webpack_require__(/*! ./pair */ 264);
-	module.exports.partial = /*#__PURE__*/__webpack_require__(/*! ./partial */ 265);
-	module.exports.partialRight = /*#__PURE__*/__webpack_require__(/*! ./partialRight */ 267);
-	module.exports.partition = /*#__PURE__*/__webpack_require__(/*! ./partition */ 268);
-	module.exports.path = /*#__PURE__*/__webpack_require__(/*! ./path */ 61);
-	module.exports.pathEq = /*#__PURE__*/__webpack_require__(/*! ./pathEq */ 269);
-	module.exports.pathOr = /*#__PURE__*/__webpack_require__(/*! ./pathOr */ 270);
-	module.exports.pathSatisfies = /*#__PURE__*/__webpack_require__(/*! ./pathSatisfies */ 271);
-	module.exports.pick = /*#__PURE__*/__webpack_require__(/*! ./pick */ 272);
-	module.exports.pickAll = /*#__PURE__*/__webpack_require__(/*! ./pickAll */ 273);
-	module.exports.pickBy = /*#__PURE__*/__webpack_require__(/*! ./pickBy */ 274);
-	module.exports.pipe = /*#__PURE__*/__webpack_require__(/*! ./pipe */ 103);
-	module.exports.pipeK = /*#__PURE__*/__webpack_require__(/*! ./pipeK */ 275);
-	module.exports.pipeP = /*#__PURE__*/__webpack_require__(/*! ./pipeP */ 111);
-	module.exports.pluck = /*#__PURE__*/__webpack_require__(/*! ./pluck */ 48);
-	module.exports.prepend = /*#__PURE__*/__webpack_require__(/*! ./prepend */ 276);
-	module.exports.product = /*#__PURE__*/__webpack_require__(/*! ./product */ 277);
-	module.exports.project = /*#__PURE__*/__webpack_require__(/*! ./project */ 278);
-	module.exports.prop = /*#__PURE__*/__webpack_require__(/*! ./prop */ 60);
-	module.exports.propEq = /*#__PURE__*/__webpack_require__(/*! ./propEq */ 280);
-	module.exports.propIs = /*#__PURE__*/__webpack_require__(/*! ./propIs */ 281);
-	module.exports.propOr = /*#__PURE__*/__webpack_require__(/*! ./propOr */ 282);
-	module.exports.propSatisfies = /*#__PURE__*/__webpack_require__(/*! ./propSatisfies */ 283);
-	module.exports.props = /*#__PURE__*/__webpack_require__(/*! ./props */ 284);
-	module.exports.range = /*#__PURE__*/__webpack_require__(/*! ./range */ 285);
-	module.exports.reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 62);
-	module.exports.reduceBy = /*#__PURE__*/__webpack_require__(/*! ./reduceBy */ 138);
-	module.exports.reduceRight = /*#__PURE__*/__webpack_require__(/*! ./reduceRight */ 286);
-	module.exports.reduceWhile = /*#__PURE__*/__webpack_require__(/*! ./reduceWhile */ 287);
-	module.exports.reduced = /*#__PURE__*/__webpack_require__(/*! ./reduced */ 288);
-	module.exports.reject = /*#__PURE__*/__webpack_require__(/*! ./reject */ 126);
-	module.exports.remove = /*#__PURE__*/__webpack_require__(/*! ./remove */ 147);
-	module.exports.repeat = /*#__PURE__*/__webpack_require__(/*! ./repeat */ 289);
-	module.exports.replace = /*#__PURE__*/__webpack_require__(/*! ./replace */ 291);
-	module.exports.reverse = /*#__PURE__*/__webpack_require__(/*! ./reverse */ 108);
-	module.exports.scan = /*#__PURE__*/__webpack_require__(/*! ./scan */ 292);
-	module.exports.sequence = /*#__PURE__*/__webpack_require__(/*! ./sequence */ 293);
-	module.exports.set = /*#__PURE__*/__webpack_require__(/*! ./set */ 294);
-	module.exports.slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 107);
-	module.exports.sort = /*#__PURE__*/__webpack_require__(/*! ./sort */ 295);
-	module.exports.sortBy = /*#__PURE__*/__webpack_require__(/*! ./sortBy */ 296);
-	module.exports.sortWith = /*#__PURE__*/__webpack_require__(/*! ./sortWith */ 297);
-	module.exports.split = /*#__PURE__*/__webpack_require__(/*! ./split */ 298);
-	module.exports.splitAt = /*#__PURE__*/__webpack_require__(/*! ./splitAt */ 299);
-	module.exports.splitEvery = /*#__PURE__*/__webpack_require__(/*! ./splitEvery */ 300);
-	module.exports.splitWhen = /*#__PURE__*/__webpack_require__(/*! ./splitWhen */ 301);
-	module.exports.startsWith = /*#__PURE__*/__webpack_require__(/*! ./startsWith */ 302);
-	module.exports.subtract = /*#__PURE__*/__webpack_require__(/*! ./subtract */ 303);
-	module.exports.sum = /*#__PURE__*/__webpack_require__(/*! ./sum */ 239);
-	module.exports.symmetricDifference = /*#__PURE__*/__webpack_require__(/*! ./symmetricDifference */ 304);
-	module.exports.symmetricDifferenceWith = /*#__PURE__*/__webpack_require__(/*! ./symmetricDifferenceWith */ 305);
-	module.exports.tail = /*#__PURE__*/__webpack_require__(/*! ./tail */ 105);
-	module.exports.take = /*#__PURE__*/__webpack_require__(/*! ./take */ 154);
-	module.exports.takeLast = /*#__PURE__*/__webpack_require__(/*! ./takeLast */ 171);
-	module.exports.takeLastWhile = /*#__PURE__*/__webpack_require__(/*! ./takeLastWhile */ 306);
-	module.exports.takeWhile = /*#__PURE__*/__webpack_require__(/*! ./takeWhile */ 307);
-	module.exports.tap = /*#__PURE__*/__webpack_require__(/*! ./tap */ 309);
-	module.exports.test = /*#__PURE__*/__webpack_require__(/*! ./test */ 311);
-	module.exports.times = /*#__PURE__*/__webpack_require__(/*! ./times */ 290);
-	module.exports.toLower = /*#__PURE__*/__webpack_require__(/*! ./toLower */ 313);
-	module.exports.toPairs = /*#__PURE__*/__webpack_require__(/*! ./toPairs */ 314);
-	module.exports.toPairsIn = /*#__PURE__*/__webpack_require__(/*! ./toPairsIn */ 315);
-	module.exports.toString = /*#__PURE__*/__webpack_require__(/*! ./toString */ 114);
-	module.exports.toUpper = /*#__PURE__*/__webpack_require__(/*! ./toUpper */ 316);
-	module.exports.transduce = /*#__PURE__*/__webpack_require__(/*! ./transduce */ 317);
-	module.exports.transpose = /*#__PURE__*/__webpack_require__(/*! ./transpose */ 318);
-	module.exports.traverse = /*#__PURE__*/__webpack_require__(/*! ./traverse */ 319);
-	module.exports.trim = /*#__PURE__*/__webpack_require__(/*! ./trim */ 320);
-	module.exports.tryCatch = /*#__PURE__*/__webpack_require__(/*! ./tryCatch */ 321);
-	module.exports.type = /*#__PURE__*/__webpack_require__(/*! ./type */ 98);
-	module.exports.unapply = /*#__PURE__*/__webpack_require__(/*! ./unapply */ 322);
-	module.exports.unary = /*#__PURE__*/__webpack_require__(/*! ./unary */ 323);
-	module.exports.uncurryN = /*#__PURE__*/__webpack_require__(/*! ./uncurryN */ 324);
-	module.exports.unfold = /*#__PURE__*/__webpack_require__(/*! ./unfold */ 325);
-	module.exports.union = /*#__PURE__*/__webpack_require__(/*! ./union */ 326);
-	module.exports.unionWith = /*#__PURE__*/__webpack_require__(/*! ./unionWith */ 327);
-	module.exports.uniq = /*#__PURE__*/__webpack_require__(/*! ./uniq */ 206);
-	module.exports.uniqBy = /*#__PURE__*/__webpack_require__(/*! ./uniqBy */ 207);
-	module.exports.uniqWith = /*#__PURE__*/__webpack_require__(/*! ./uniqWith */ 328);
-	module.exports.unless = /*#__PURE__*/__webpack_require__(/*! ./unless */ 329);
-	module.exports.unnest = /*#__PURE__*/__webpack_require__(/*! ./unnest */ 330);
-	module.exports.until = /*#__PURE__*/__webpack_require__(/*! ./until */ 331);
-	module.exports.update = /*#__PURE__*/__webpack_require__(/*! ./update */ 148);
-	module.exports.useWith = /*#__PURE__*/__webpack_require__(/*! ./useWith */ 279);
-	module.exports.values = /*#__PURE__*/__webpack_require__(/*! ./values */ 74);
-	module.exports.valuesIn = /*#__PURE__*/__webpack_require__(/*! ./valuesIn */ 332);
-	module.exports.view = /*#__PURE__*/__webpack_require__(/*! ./view */ 333);
-	module.exports.when = /*#__PURE__*/__webpack_require__(/*! ./when */ 334);
-	module.exports.where = /*#__PURE__*/__webpack_require__(/*! ./where */ 335);
-	module.exports.whereEq = /*#__PURE__*/__webpack_require__(/*! ./whereEq */ 336);
-	module.exports.without = /*#__PURE__*/__webpack_require__(/*! ./without */ 337);
-	module.exports.xprod = /*#__PURE__*/__webpack_require__(/*! ./xprod */ 338);
-	module.exports.zip = /*#__PURE__*/__webpack_require__(/*! ./zip */ 339);
-	module.exports.zipObj = /*#__PURE__*/__webpack_require__(/*! ./zipObj */ 340);
-	module.exports.zipWith = /*#__PURE__*/__webpack_require__(/*! ./zipWith */ 341);
+	module.exports.F = /*#__PURE__*/__webpack_require__(/*! ./F */ 26);
+	module.exports.T = /*#__PURE__*/__webpack_require__(/*! ./T */ 30);
+	module.exports.__ = /*#__PURE__*/__webpack_require__(/*! ./__ */ 31);
+	module.exports.add = /*#__PURE__*/__webpack_require__(/*! ./add */ 32);
+	module.exports.addIndex = /*#__PURE__*/__webpack_require__(/*! ./addIndex */ 34);
+	module.exports.adjust = /*#__PURE__*/__webpack_require__(/*! ./adjust */ 39);
+	module.exports.all = /*#__PURE__*/__webpack_require__(/*! ./all */ 41);
+	module.exports.allPass = /*#__PURE__*/__webpack_require__(/*! ./allPass */ 48);
+	module.exports.always = /*#__PURE__*/__webpack_require__(/*! ./always */ 27);
+	module.exports.and = /*#__PURE__*/__webpack_require__(/*! ./and */ 65);
+	module.exports.any = /*#__PURE__*/__webpack_require__(/*! ./any */ 66);
+	module.exports.anyPass = /*#__PURE__*/__webpack_require__(/*! ./anyPass */ 68);
+	module.exports.ap = /*#__PURE__*/__webpack_require__(/*! ./ap */ 69);
+	module.exports.aperture = /*#__PURE__*/__webpack_require__(/*! ./aperture */ 70);
+	module.exports.append = /*#__PURE__*/__webpack_require__(/*! ./append */ 73);
+	module.exports.apply = /*#__PURE__*/__webpack_require__(/*! ./apply */ 74);
+	module.exports.applySpec = /*#__PURE__*/__webpack_require__(/*! ./applySpec */ 75);
+	module.exports.applyTo = /*#__PURE__*/__webpack_require__(/*! ./applyTo */ 77);
+	module.exports.ascend = /*#__PURE__*/__webpack_require__(/*! ./ascend */ 78);
+	module.exports.assoc = /*#__PURE__*/__webpack_require__(/*! ./assoc */ 79);
+	module.exports.assocPath = /*#__PURE__*/__webpack_require__(/*! ./assocPath */ 80);
+	module.exports.binary = /*#__PURE__*/__webpack_require__(/*! ./binary */ 83);
+	module.exports.bind = /*#__PURE__*/__webpack_require__(/*! ./bind */ 57);
+	module.exports.both = /*#__PURE__*/__webpack_require__(/*! ./both */ 85);
+	module.exports.call = /*#__PURE__*/__webpack_require__(/*! ./call */ 89);
+	module.exports.chain = /*#__PURE__*/__webpack_require__(/*! ./chain */ 91);
+	module.exports.clamp = /*#__PURE__*/__webpack_require__(/*! ./clamp */ 96);
+	module.exports.clone = /*#__PURE__*/__webpack_require__(/*! ./clone */ 97);
+	module.exports.comparator = /*#__PURE__*/__webpack_require__(/*! ./comparator */ 101);
+	module.exports.complement = /*#__PURE__*/__webpack_require__(/*! ./complement */ 102);
+	module.exports.compose = /*#__PURE__*/__webpack_require__(/*! ./compose */ 104);
+	module.exports.composeK = /*#__PURE__*/__webpack_require__(/*! ./composeK */ 111);
+	module.exports.composeP = /*#__PURE__*/__webpack_require__(/*! ./composeP */ 112);
+	module.exports.concat = /*#__PURE__*/__webpack_require__(/*! ./concat */ 115);
+	module.exports.cond = /*#__PURE__*/__webpack_require__(/*! ./cond */ 134);
+	module.exports.construct = /*#__PURE__*/__webpack_require__(/*! ./construct */ 135);
+	module.exports.constructN = /*#__PURE__*/__webpack_require__(/*! ./constructN */ 136);
+	module.exports.contains = /*#__PURE__*/__webpack_require__(/*! ./contains */ 137);
+	module.exports.converge = /*#__PURE__*/__webpack_require__(/*! ./converge */ 138);
+	module.exports.countBy = /*#__PURE__*/__webpack_require__(/*! ./countBy */ 139);
+	module.exports.curry = /*#__PURE__*/__webpack_require__(/*! ./curry */ 90);
+	module.exports.curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
+	module.exports.dec = /*#__PURE__*/__webpack_require__(/*! ./dec */ 142);
+	module.exports.defaultTo = /*#__PURE__*/__webpack_require__(/*! ./defaultTo */ 143);
+	module.exports.descend = /*#__PURE__*/__webpack_require__(/*! ./descend */ 144);
+	module.exports.difference = /*#__PURE__*/__webpack_require__(/*! ./difference */ 145);
+	module.exports.differenceWith = /*#__PURE__*/__webpack_require__(/*! ./differenceWith */ 146);
+	module.exports.dissoc = /*#__PURE__*/__webpack_require__(/*! ./dissoc */ 147);
+	module.exports.dissocPath = /*#__PURE__*/__webpack_require__(/*! ./dissocPath */ 148);
+	module.exports.divide = /*#__PURE__*/__webpack_require__(/*! ./divide */ 151);
+	module.exports.drop = /*#__PURE__*/__webpack_require__(/*! ./drop */ 152);
+	module.exports.dropLast = /*#__PURE__*/__webpack_require__(/*! ./dropLast */ 154);
+	module.exports.dropLastWhile = /*#__PURE__*/__webpack_require__(/*! ./dropLastWhile */ 159);
+	module.exports.dropRepeats = /*#__PURE__*/__webpack_require__(/*! ./dropRepeats */ 162);
+	module.exports.dropRepeatsWith = /*#__PURE__*/__webpack_require__(/*! ./dropRepeatsWith */ 164);
+	module.exports.dropWhile = /*#__PURE__*/__webpack_require__(/*! ./dropWhile */ 167);
+	module.exports.either = /*#__PURE__*/__webpack_require__(/*! ./either */ 169);
+	module.exports.empty = /*#__PURE__*/__webpack_require__(/*! ./empty */ 171);
+	module.exports.endsWith = /*#__PURE__*/__webpack_require__(/*! ./endsWith */ 172);
+	module.exports.eqBy = /*#__PURE__*/__webpack_require__(/*! ./eqBy */ 174);
+	module.exports.eqProps = /*#__PURE__*/__webpack_require__(/*! ./eqProps */ 175);
+	module.exports.equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 120);
+	module.exports.evolve = /*#__PURE__*/__webpack_require__(/*! ./evolve */ 176);
+	module.exports.filter = /*#__PURE__*/__webpack_require__(/*! ./filter */ 130);
+	module.exports.find = /*#__PURE__*/__webpack_require__(/*! ./find */ 177);
+	module.exports.findIndex = /*#__PURE__*/__webpack_require__(/*! ./findIndex */ 179);
+	module.exports.findLast = /*#__PURE__*/__webpack_require__(/*! ./findLast */ 181);
+	module.exports.findLastIndex = /*#__PURE__*/__webpack_require__(/*! ./findLastIndex */ 183);
+	module.exports.flatten = /*#__PURE__*/__webpack_require__(/*! ./flatten */ 185);
+	module.exports.flip = /*#__PURE__*/__webpack_require__(/*! ./flip */ 186);
+	module.exports.forEach = /*#__PURE__*/__webpack_require__(/*! ./forEach */ 187);
+	module.exports.forEachObjIndexed = /*#__PURE__*/__webpack_require__(/*! ./forEachObjIndexed */ 188);
+	module.exports.fromPairs = /*#__PURE__*/__webpack_require__(/*! ./fromPairs */ 189);
+	module.exports.groupBy = /*#__PURE__*/__webpack_require__(/*! ./groupBy */ 190);
+	module.exports.groupWith = /*#__PURE__*/__webpack_require__(/*! ./groupWith */ 191);
+	module.exports.gt = /*#__PURE__*/__webpack_require__(/*! ./gt */ 192);
+	module.exports.gte = /*#__PURE__*/__webpack_require__(/*! ./gte */ 193);
+	module.exports.has = /*#__PURE__*/__webpack_require__(/*! ./has */ 194);
+	module.exports.hasIn = /*#__PURE__*/__webpack_require__(/*! ./hasIn */ 195);
+	module.exports.head = /*#__PURE__*/__webpack_require__(/*! ./head */ 196);
+	module.exports.identical = /*#__PURE__*/__webpack_require__(/*! ./identical */ 125);
+	module.exports.identity = /*#__PURE__*/__webpack_require__(/*! ./identity */ 197);
+	module.exports.ifElse = /*#__PURE__*/__webpack_require__(/*! ./ifElse */ 199);
+	module.exports.inc = /*#__PURE__*/__webpack_require__(/*! ./inc */ 200);
+	module.exports.indexBy = /*#__PURE__*/__webpack_require__(/*! ./indexBy */ 201);
+	module.exports.indexOf = /*#__PURE__*/__webpack_require__(/*! ./indexOf */ 202);
+	module.exports.init = /*#__PURE__*/__webpack_require__(/*! ./init */ 203);
+	module.exports.innerJoin = /*#__PURE__*/__webpack_require__(/*! ./innerJoin */ 204);
+	module.exports.insert = /*#__PURE__*/__webpack_require__(/*! ./insert */ 205);
+	module.exports.insertAll = /*#__PURE__*/__webpack_require__(/*! ./insertAll */ 206);
+	module.exports.intersection = /*#__PURE__*/__webpack_require__(/*! ./intersection */ 207);
+	module.exports.intersperse = /*#__PURE__*/__webpack_require__(/*! ./intersperse */ 211);
+	module.exports.into = /*#__PURE__*/__webpack_require__(/*! ./into */ 212);
+	module.exports.invert = /*#__PURE__*/__webpack_require__(/*! ./invert */ 217);
+	module.exports.invertObj = /*#__PURE__*/__webpack_require__(/*! ./invertObj */ 218);
+	module.exports.invoker = /*#__PURE__*/__webpack_require__(/*! ./invoker */ 219);
+	module.exports.is = /*#__PURE__*/__webpack_require__(/*! ./is */ 220);
+	module.exports.isEmpty = /*#__PURE__*/__webpack_require__(/*! ./isEmpty */ 221);
+	module.exports.isNil = /*#__PURE__*/__webpack_require__(/*! ./isNil */ 82);
+	module.exports.join = /*#__PURE__*/__webpack_require__(/*! ./join */ 222);
+	module.exports.juxt = /*#__PURE__*/__webpack_require__(/*! ./juxt */ 223);
+	module.exports.keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 59);
+	module.exports.keysIn = /*#__PURE__*/__webpack_require__(/*! ./keysIn */ 224);
+	module.exports.last = /*#__PURE__*/__webpack_require__(/*! ./last */ 165);
+	module.exports.lastIndexOf = /*#__PURE__*/__webpack_require__(/*! ./lastIndexOf */ 225);
+	module.exports.length = /*#__PURE__*/__webpack_require__(/*! ./length */ 226);
+	module.exports.lens = /*#__PURE__*/__webpack_require__(/*! ./lens */ 228);
+	module.exports.lensIndex = /*#__PURE__*/__webpack_require__(/*! ./lensIndex */ 229);
+	module.exports.lensPath = /*#__PURE__*/__webpack_require__(/*! ./lensPath */ 230);
+	module.exports.lensProp = /*#__PURE__*/__webpack_require__(/*! ./lensProp */ 231);
+	module.exports.lift = /*#__PURE__*/__webpack_require__(/*! ./lift */ 87);
+	module.exports.liftN = /*#__PURE__*/__webpack_require__(/*! ./liftN */ 88);
+	module.exports.lt = /*#__PURE__*/__webpack_require__(/*! ./lt */ 232);
+	module.exports.lte = /*#__PURE__*/__webpack_require__(/*! ./lte */ 233);
+	module.exports.map = /*#__PURE__*/__webpack_require__(/*! ./map */ 51);
+	module.exports.mapAccum = /*#__PURE__*/__webpack_require__(/*! ./mapAccum */ 234);
+	module.exports.mapAccumRight = /*#__PURE__*/__webpack_require__(/*! ./mapAccumRight */ 235);
+	module.exports.mapObjIndexed = /*#__PURE__*/__webpack_require__(/*! ./mapObjIndexed */ 236);
+	module.exports.match = /*#__PURE__*/__webpack_require__(/*! ./match */ 237);
+	module.exports.mathMod = /*#__PURE__*/__webpack_require__(/*! ./mathMod */ 238);
+	module.exports.max = /*#__PURE__*/__webpack_require__(/*! ./max */ 49);
+	module.exports.maxBy = /*#__PURE__*/__webpack_require__(/*! ./maxBy */ 239);
+	module.exports.mean = /*#__PURE__*/__webpack_require__(/*! ./mean */ 240);
+	module.exports.median = /*#__PURE__*/__webpack_require__(/*! ./median */ 242);
+	module.exports.memoize = /*#__PURE__*/__webpack_require__(/*! ./memoize */ 243);
+	module.exports.memoizeWith = /*#__PURE__*/__webpack_require__(/*! ./memoizeWith */ 244);
+	module.exports.merge = /*#__PURE__*/__webpack_require__(/*! ./merge */ 245);
+	module.exports.mergeAll = /*#__PURE__*/__webpack_require__(/*! ./mergeAll */ 246);
+	module.exports.mergeDeepLeft = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepLeft */ 247);
+	module.exports.mergeDeepRight = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepRight */ 250);
+	module.exports.mergeDeepWith = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepWith */ 251);
+	module.exports.mergeDeepWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepWithKey */ 248);
+	module.exports.mergeWith = /*#__PURE__*/__webpack_require__(/*! ./mergeWith */ 252);
+	module.exports.mergeWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeWithKey */ 249);
+	module.exports.min = /*#__PURE__*/__webpack_require__(/*! ./min */ 253);
+	module.exports.minBy = /*#__PURE__*/__webpack_require__(/*! ./minBy */ 254);
+	module.exports.modulo = /*#__PURE__*/__webpack_require__(/*! ./modulo */ 255);
+	module.exports.multiply = /*#__PURE__*/__webpack_require__(/*! ./multiply */ 256);
+	module.exports.nAry = /*#__PURE__*/__webpack_require__(/*! ./nAry */ 84);
+	module.exports.negate = /*#__PURE__*/__webpack_require__(/*! ./negate */ 257);
+	module.exports.none = /*#__PURE__*/__webpack_require__(/*! ./none */ 258);
+	module.exports.not = /*#__PURE__*/__webpack_require__(/*! ./not */ 103);
+	module.exports.nth = /*#__PURE__*/__webpack_require__(/*! ./nth */ 166);
+	module.exports.nthArg = /*#__PURE__*/__webpack_require__(/*! ./nthArg */ 259);
+	module.exports.o = /*#__PURE__*/__webpack_require__(/*! ./o */ 260);
+	module.exports.objOf = /*#__PURE__*/__webpack_require__(/*! ./objOf */ 216);
+	module.exports.of = /*#__PURE__*/__webpack_require__(/*! ./of */ 261);
+	module.exports.omit = /*#__PURE__*/__webpack_require__(/*! ./omit */ 263);
+	module.exports.once = /*#__PURE__*/__webpack_require__(/*! ./once */ 264);
+	module.exports.or = /*#__PURE__*/__webpack_require__(/*! ./or */ 170);
+	module.exports.over = /*#__PURE__*/__webpack_require__(/*! ./over */ 265);
+	module.exports.pair = /*#__PURE__*/__webpack_require__(/*! ./pair */ 266);
+	module.exports.partial = /*#__PURE__*/__webpack_require__(/*! ./partial */ 267);
+	module.exports.partialRight = /*#__PURE__*/__webpack_require__(/*! ./partialRight */ 269);
+	module.exports.partition = /*#__PURE__*/__webpack_require__(/*! ./partition */ 270);
+	module.exports.path = /*#__PURE__*/__webpack_require__(/*! ./path */ 63);
+	module.exports.pathEq = /*#__PURE__*/__webpack_require__(/*! ./pathEq */ 271);
+	module.exports.pathOr = /*#__PURE__*/__webpack_require__(/*! ./pathOr */ 272);
+	module.exports.pathSatisfies = /*#__PURE__*/__webpack_require__(/*! ./pathSatisfies */ 273);
+	module.exports.pick = /*#__PURE__*/__webpack_require__(/*! ./pick */ 274);
+	module.exports.pickAll = /*#__PURE__*/__webpack_require__(/*! ./pickAll */ 275);
+	module.exports.pickBy = /*#__PURE__*/__webpack_require__(/*! ./pickBy */ 276);
+	module.exports.pipe = /*#__PURE__*/__webpack_require__(/*! ./pipe */ 105);
+	module.exports.pipeK = /*#__PURE__*/__webpack_require__(/*! ./pipeK */ 277);
+	module.exports.pipeP = /*#__PURE__*/__webpack_require__(/*! ./pipeP */ 113);
+	module.exports.pluck = /*#__PURE__*/__webpack_require__(/*! ./pluck */ 50);
+	module.exports.prepend = /*#__PURE__*/__webpack_require__(/*! ./prepend */ 278);
+	module.exports.product = /*#__PURE__*/__webpack_require__(/*! ./product */ 279);
+	module.exports.project = /*#__PURE__*/__webpack_require__(/*! ./project */ 280);
+	module.exports.prop = /*#__PURE__*/__webpack_require__(/*! ./prop */ 62);
+	module.exports.propEq = /*#__PURE__*/__webpack_require__(/*! ./propEq */ 282);
+	module.exports.propIs = /*#__PURE__*/__webpack_require__(/*! ./propIs */ 283);
+	module.exports.propOr = /*#__PURE__*/__webpack_require__(/*! ./propOr */ 284);
+	module.exports.propSatisfies = /*#__PURE__*/__webpack_require__(/*! ./propSatisfies */ 285);
+	module.exports.props = /*#__PURE__*/__webpack_require__(/*! ./props */ 286);
+	module.exports.range = /*#__PURE__*/__webpack_require__(/*! ./range */ 287);
+	module.exports.reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 64);
+	module.exports.reduceBy = /*#__PURE__*/__webpack_require__(/*! ./reduceBy */ 140);
+	module.exports.reduceRight = /*#__PURE__*/__webpack_require__(/*! ./reduceRight */ 288);
+	module.exports.reduceWhile = /*#__PURE__*/__webpack_require__(/*! ./reduceWhile */ 289);
+	module.exports.reduced = /*#__PURE__*/__webpack_require__(/*! ./reduced */ 290);
+	module.exports.reject = /*#__PURE__*/__webpack_require__(/*! ./reject */ 128);
+	module.exports.remove = /*#__PURE__*/__webpack_require__(/*! ./remove */ 149);
+	module.exports.repeat = /*#__PURE__*/__webpack_require__(/*! ./repeat */ 291);
+	module.exports.replace = /*#__PURE__*/__webpack_require__(/*! ./replace */ 293);
+	module.exports.reverse = /*#__PURE__*/__webpack_require__(/*! ./reverse */ 110);
+	module.exports.scan = /*#__PURE__*/__webpack_require__(/*! ./scan */ 294);
+	module.exports.sequence = /*#__PURE__*/__webpack_require__(/*! ./sequence */ 295);
+	module.exports.set = /*#__PURE__*/__webpack_require__(/*! ./set */ 296);
+	module.exports.slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 109);
+	module.exports.sort = /*#__PURE__*/__webpack_require__(/*! ./sort */ 297);
+	module.exports.sortBy = /*#__PURE__*/__webpack_require__(/*! ./sortBy */ 298);
+	module.exports.sortWith = /*#__PURE__*/__webpack_require__(/*! ./sortWith */ 299);
+	module.exports.split = /*#__PURE__*/__webpack_require__(/*! ./split */ 300);
+	module.exports.splitAt = /*#__PURE__*/__webpack_require__(/*! ./splitAt */ 301);
+	module.exports.splitEvery = /*#__PURE__*/__webpack_require__(/*! ./splitEvery */ 302);
+	module.exports.splitWhen = /*#__PURE__*/__webpack_require__(/*! ./splitWhen */ 303);
+	module.exports.startsWith = /*#__PURE__*/__webpack_require__(/*! ./startsWith */ 304);
+	module.exports.subtract = /*#__PURE__*/__webpack_require__(/*! ./subtract */ 305);
+	module.exports.sum = /*#__PURE__*/__webpack_require__(/*! ./sum */ 241);
+	module.exports.symmetricDifference = /*#__PURE__*/__webpack_require__(/*! ./symmetricDifference */ 306);
+	module.exports.symmetricDifferenceWith = /*#__PURE__*/__webpack_require__(/*! ./symmetricDifferenceWith */ 307);
+	module.exports.tail = /*#__PURE__*/__webpack_require__(/*! ./tail */ 107);
+	module.exports.take = /*#__PURE__*/__webpack_require__(/*! ./take */ 156);
+	module.exports.takeLast = /*#__PURE__*/__webpack_require__(/*! ./takeLast */ 173);
+	module.exports.takeLastWhile = /*#__PURE__*/__webpack_require__(/*! ./takeLastWhile */ 308);
+	module.exports.takeWhile = /*#__PURE__*/__webpack_require__(/*! ./takeWhile */ 309);
+	module.exports.tap = /*#__PURE__*/__webpack_require__(/*! ./tap */ 311);
+	module.exports.test = /*#__PURE__*/__webpack_require__(/*! ./test */ 313);
+	module.exports.times = /*#__PURE__*/__webpack_require__(/*! ./times */ 292);
+	module.exports.toLower = /*#__PURE__*/__webpack_require__(/*! ./toLower */ 315);
+	module.exports.toPairs = /*#__PURE__*/__webpack_require__(/*! ./toPairs */ 316);
+	module.exports.toPairsIn = /*#__PURE__*/__webpack_require__(/*! ./toPairsIn */ 317);
+	module.exports.toString = /*#__PURE__*/__webpack_require__(/*! ./toString */ 116);
+	module.exports.toUpper = /*#__PURE__*/__webpack_require__(/*! ./toUpper */ 318);
+	module.exports.transduce = /*#__PURE__*/__webpack_require__(/*! ./transduce */ 319);
+	module.exports.transpose = /*#__PURE__*/__webpack_require__(/*! ./transpose */ 320);
+	module.exports.traverse = /*#__PURE__*/__webpack_require__(/*! ./traverse */ 321);
+	module.exports.trim = /*#__PURE__*/__webpack_require__(/*! ./trim */ 322);
+	module.exports.tryCatch = /*#__PURE__*/__webpack_require__(/*! ./tryCatch */ 323);
+	module.exports.type = /*#__PURE__*/__webpack_require__(/*! ./type */ 100);
+	module.exports.unapply = /*#__PURE__*/__webpack_require__(/*! ./unapply */ 324);
+	module.exports.unary = /*#__PURE__*/__webpack_require__(/*! ./unary */ 325);
+	module.exports.uncurryN = /*#__PURE__*/__webpack_require__(/*! ./uncurryN */ 326);
+	module.exports.unfold = /*#__PURE__*/__webpack_require__(/*! ./unfold */ 327);
+	module.exports.union = /*#__PURE__*/__webpack_require__(/*! ./union */ 328);
+	module.exports.unionWith = /*#__PURE__*/__webpack_require__(/*! ./unionWith */ 329);
+	module.exports.uniq = /*#__PURE__*/__webpack_require__(/*! ./uniq */ 208);
+	module.exports.uniqBy = /*#__PURE__*/__webpack_require__(/*! ./uniqBy */ 209);
+	module.exports.uniqWith = /*#__PURE__*/__webpack_require__(/*! ./uniqWith */ 330);
+	module.exports.unless = /*#__PURE__*/__webpack_require__(/*! ./unless */ 331);
+	module.exports.unnest = /*#__PURE__*/__webpack_require__(/*! ./unnest */ 332);
+	module.exports.until = /*#__PURE__*/__webpack_require__(/*! ./until */ 333);
+	module.exports.update = /*#__PURE__*/__webpack_require__(/*! ./update */ 150);
+	module.exports.useWith = /*#__PURE__*/__webpack_require__(/*! ./useWith */ 281);
+	module.exports.values = /*#__PURE__*/__webpack_require__(/*! ./values */ 76);
+	module.exports.valuesIn = /*#__PURE__*/__webpack_require__(/*! ./valuesIn */ 334);
+	module.exports.view = /*#__PURE__*/__webpack_require__(/*! ./view */ 335);
+	module.exports.when = /*#__PURE__*/__webpack_require__(/*! ./when */ 336);
+	module.exports.where = /*#__PURE__*/__webpack_require__(/*! ./where */ 337);
+	module.exports.whereEq = /*#__PURE__*/__webpack_require__(/*! ./whereEq */ 338);
+	module.exports.without = /*#__PURE__*/__webpack_require__(/*! ./without */ 339);
+	module.exports.xprod = /*#__PURE__*/__webpack_require__(/*! ./xprod */ 340);
+	module.exports.zip = /*#__PURE__*/__webpack_require__(/*! ./zip */ 341);
+	module.exports.zipObj = /*#__PURE__*/__webpack_require__(/*! ./zipObj */ 342);
+	module.exports.zipWith = /*#__PURE__*/__webpack_require__(/*! ./zipWith */ 343);
 
 /***/ },
-/* 24 */
+/* 26 */
 /*!**************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/F.js ***!
   \**************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var always = /*#__PURE__*/__webpack_require__(/*! ./always */ 25);
+	var always = /*#__PURE__*/__webpack_require__(/*! ./always */ 27);
 	
 	/**
 	 * A function that always returns `false`. Any passed in parameters are ignored.
@@ -20693,13 +20804,13 @@ this["dash_composed"] =
 	module.exports = F;
 
 /***/ },
-/* 25 */
+/* 27 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/always.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Returns a function that always returns the given value. Note that for
@@ -20730,13 +20841,13 @@ this["dash_composed"] =
 	module.exports = always;
 
 /***/ },
-/* 26 */
+/* 28 */
 /*!*****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_curry1.js ***!
   \*****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _isPlaceholder = /*#__PURE__*/__webpack_require__(/*! ./_isPlaceholder */ 27);
+	var _isPlaceholder = /*#__PURE__*/__webpack_require__(/*! ./_isPlaceholder */ 29);
 	
 	/**
 	 * Optimized internal one-arity curry function.
@@ -20760,7 +20871,7 @@ this["dash_composed"] =
 	module.exports = _curry1;
 
 /***/ },
-/* 27 */
+/* 29 */
 /*!************************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_isPlaceholder.js ***!
   \************************************************************************************/
@@ -20772,13 +20883,13 @@ this["dash_composed"] =
 	module.exports = _isPlaceholder;
 
 /***/ },
-/* 28 */
+/* 30 */
 /*!**************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/T.js ***!
   \**************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var always = /*#__PURE__*/__webpack_require__(/*! ./always */ 25);
+	var always = /*#__PURE__*/__webpack_require__(/*! ./always */ 27);
 	
 	/**
 	 * A function that always returns `true`. Any passed in parameters are ignored.
@@ -20801,7 +20912,7 @@ this["dash_composed"] =
 	module.exports = T;
 
 /***/ },
-/* 29 */
+/* 31 */
 /*!***************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/__.js ***!
   \***************************************************************/
@@ -20836,13 +20947,13 @@ this["dash_composed"] =
 	module.exports = { '@@functional/placeholder': true };
 
 /***/ },
-/* 30 */
+/* 32 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/add.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Adds two values.
@@ -20869,15 +20980,15 @@ this["dash_composed"] =
 	module.exports = add;
 
 /***/ },
-/* 31 */
+/* 33 */
 /*!*****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_curry2.js ***!
   \*****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./_curry1 */ 28);
 	
-	var _isPlaceholder = /*#__PURE__*/__webpack_require__(/*! ./_isPlaceholder */ 27);
+	var _isPlaceholder = /*#__PURE__*/__webpack_require__(/*! ./_isPlaceholder */ 29);
 	
 	/**
 	 * Optimized internal two-arity curry function.
@@ -20910,17 +21021,17 @@ this["dash_composed"] =
 	module.exports = _curry2;
 
 /***/ },
-/* 32 */
+/* 34 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/addIndex.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 33);
+	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 35);
 	
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
 	/**
 	 * Creates a new list iteration function from an existing one by adding two new
@@ -20965,7 +21076,7 @@ this["dash_composed"] =
 	module.exports = addIndex;
 
 /***/ },
-/* 33 */
+/* 35 */
 /*!*****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_concat.js ***!
   \*****************************************************************************/
@@ -21005,19 +21116,19 @@ this["dash_composed"] =
 	module.exports = _concat;
 
 /***/ },
-/* 34 */
+/* 36 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/curryN.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 35);
+	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 37);
 	
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _curryN = /*#__PURE__*/__webpack_require__(/*! ./internal/_curryN */ 36);
+	var _curryN = /*#__PURE__*/__webpack_require__(/*! ./internal/_curryN */ 38);
 	
 	/**
 	 * Returns a curried equivalent of the provided function, with the specified
@@ -21072,7 +21183,7 @@ this["dash_composed"] =
 	module.exports = curryN;
 
 /***/ },
-/* 35 */
+/* 37 */
 /*!****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_arity.js ***!
   \****************************************************************************/
@@ -21132,15 +21243,15 @@ this["dash_composed"] =
 	module.exports = _arity;
 
 /***/ },
-/* 36 */
+/* 38 */
 /*!*****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_curryN.js ***!
   \*****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _arity = /*#__PURE__*/__webpack_require__(/*! ./_arity */ 35);
+	var _arity = /*#__PURE__*/__webpack_require__(/*! ./_arity */ 37);
 	
-	var _isPlaceholder = /*#__PURE__*/__webpack_require__(/*! ./_isPlaceholder */ 27);
+	var _isPlaceholder = /*#__PURE__*/__webpack_require__(/*! ./_isPlaceholder */ 29);
 	
 	/**
 	 * Internal curryN function.
@@ -21180,15 +21291,15 @@ this["dash_composed"] =
 	module.exports = _curryN;
 
 /***/ },
-/* 37 */
+/* 39 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/adjust.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 33);
+	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 35);
 	
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Applies a function to the value at the given index of an array, returning a
@@ -21230,17 +21341,17 @@ this["dash_composed"] =
 	module.exports = adjust;
 
 /***/ },
-/* 38 */
+/* 40 */
 /*!*****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_curry3.js ***!
   \*****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./_curry1 */ 28);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _isPlaceholder = /*#__PURE__*/__webpack_require__(/*! ./_isPlaceholder */ 27);
+	var _isPlaceholder = /*#__PURE__*/__webpack_require__(/*! ./_isPlaceholder */ 29);
 	
 	/**
 	 * Optimized internal three-arity curry function.
@@ -21289,17 +21400,17 @@ this["dash_composed"] =
 	module.exports = _curry3;
 
 /***/ },
-/* 39 */
+/* 41 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/all.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xall = /*#__PURE__*/__webpack_require__(/*! ./internal/_xall */ 43);
+	var _xall = /*#__PURE__*/__webpack_require__(/*! ./internal/_xall */ 45);
 	
 	/**
 	 * Returns `true` if all elements of the list match the predicate, `false` if
@@ -21340,15 +21451,15 @@ this["dash_composed"] =
 	module.exports = all;
 
 /***/ },
-/* 40 */
+/* 42 */
 /*!***********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_dispatchable.js ***!
   \***********************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./_isArray */ 41);
+	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./_isArray */ 43);
 	
-	var _isTransformer = /*#__PURE__*/__webpack_require__(/*! ./_isTransformer */ 42);
+	var _isTransformer = /*#__PURE__*/__webpack_require__(/*! ./_isTransformer */ 44);
 	
 	/**
 	 * Returns a function that dispatches with different strategies based on the
@@ -21392,7 +21503,7 @@ this["dash_composed"] =
 	module.exports = _dispatchable;
 
 /***/ },
-/* 41 */
+/* 43 */
 /*!******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_isArray.js ***!
   \******************************************************************************/
@@ -21415,7 +21526,7 @@ this["dash_composed"] =
 	};
 
 /***/ },
-/* 42 */
+/* 44 */
 /*!************************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_isTransformer.js ***!
   \************************************************************************************/
@@ -21427,17 +21538,17 @@ this["dash_composed"] =
 	module.exports = _isTransformer;
 
 /***/ },
-/* 43 */
+/* 45 */
 /*!***************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xall.js ***!
   \***************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./_reduced */ 44);
+	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./_reduced */ 46);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XAll = /*#__PURE__*/function () {
 	
@@ -21470,7 +21581,7 @@ this["dash_composed"] =
 	module.exports = _xall;
 
 /***/ },
-/* 44 */
+/* 46 */
 /*!******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_reduced.js ***!
   \******************************************************************************/
@@ -21485,7 +21596,7 @@ this["dash_composed"] =
 	module.exports = _reduced;
 
 /***/ },
-/* 45 */
+/* 47 */
 /*!*****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xfBase.js ***!
   \*****************************************************************************/
@@ -21501,21 +21612,21 @@ this["dash_composed"] =
 	};
 
 /***/ },
-/* 46 */
+/* 48 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/allPass.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
-	var max = /*#__PURE__*/__webpack_require__(/*! ./max */ 47);
+	var max = /*#__PURE__*/__webpack_require__(/*! ./max */ 49);
 	
-	var pluck = /*#__PURE__*/__webpack_require__(/*! ./pluck */ 48);
+	var pluck = /*#__PURE__*/__webpack_require__(/*! ./pluck */ 50);
 	
-	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 62);
+	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 64);
 	
 	/**
 	 * Takes a list of predicates and returns a predicate that returns true for a
@@ -21560,13 +21671,13 @@ this["dash_composed"] =
 	module.exports = allPass;
 
 /***/ },
-/* 47 */
+/* 49 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/max.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns the larger of its two arguments.
@@ -21593,17 +21704,17 @@ this["dash_composed"] =
 	module.exports = max;
 
 /***/ },
-/* 48 */
+/* 50 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/pluck.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 49);
+	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 51);
 	
-	var prop = /*#__PURE__*/__webpack_require__(/*! ./prop */ 60);
+	var prop = /*#__PURE__*/__webpack_require__(/*! ./prop */ 62);
 	
 	/**
 	 * Returns a new list by plucking the same named property off all objects in
@@ -21638,25 +21749,25 @@ this["dash_composed"] =
 	module.exports = pluck;
 
 /***/ },
-/* 49 */
+/* 51 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/map.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _map = /*#__PURE__*/__webpack_require__(/*! ./internal/_map */ 50);
+	var _map = /*#__PURE__*/__webpack_require__(/*! ./internal/_map */ 52);
 	
-	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 51);
+	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 53);
 	
-	var _xmap = /*#__PURE__*/__webpack_require__(/*! ./internal/_xmap */ 56);
+	var _xmap = /*#__PURE__*/__webpack_require__(/*! ./internal/_xmap */ 58);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
-	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 57);
+	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 59);
 	
 	/**
 	 * Takes a function and
@@ -21713,7 +21824,7 @@ this["dash_composed"] =
 	module.exports = map;
 
 /***/ },
-/* 50 */
+/* 52 */
 /*!**************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_map.js ***!
   \**************************************************************************/
@@ -21732,17 +21843,17 @@ this["dash_composed"] =
 	module.exports = _map;
 
 /***/ },
-/* 51 */
+/* 53 */
 /*!*****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_reduce.js ***!
   \*****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _isArrayLike = /*#__PURE__*/__webpack_require__(/*! ./_isArrayLike */ 52);
+	var _isArrayLike = /*#__PURE__*/__webpack_require__(/*! ./_isArrayLike */ 54);
 	
-	var _xwrap = /*#__PURE__*/__webpack_require__(/*! ./_xwrap */ 54);
+	var _xwrap = /*#__PURE__*/__webpack_require__(/*! ./_xwrap */ 56);
 	
-	var bind = /*#__PURE__*/__webpack_require__(/*! ../bind */ 55);
+	var bind = /*#__PURE__*/__webpack_require__(/*! ../bind */ 57);
 	
 	function _arrayReduce(xf, acc, list) {
 	  var idx = 0;
@@ -21802,17 +21913,17 @@ this["dash_composed"] =
 	module.exports = _reduce;
 
 /***/ },
-/* 52 */
+/* 54 */
 /*!**********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_isArrayLike.js ***!
   \**********************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./_curry1 */ 28);
 	
-	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./_isArray */ 41);
+	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./_isArray */ 43);
 	
-	var _isString = /*#__PURE__*/__webpack_require__(/*! ./_isString */ 53);
+	var _isString = /*#__PURE__*/__webpack_require__(/*! ./_isString */ 55);
 	
 	/**
 	 * Tests whether or not an object is similar to an array.
@@ -21860,7 +21971,7 @@ this["dash_composed"] =
 	module.exports = _isArrayLike;
 
 /***/ },
-/* 53 */
+/* 55 */
 /*!*******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_isString.js ***!
   \*******************************************************************************/
@@ -21872,7 +21983,7 @@ this["dash_composed"] =
 	module.exports = _isString;
 
 /***/ },
-/* 54 */
+/* 56 */
 /*!****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xwrap.js ***!
   \****************************************************************************/
@@ -21901,15 +22012,15 @@ this["dash_composed"] =
 	module.exports = _xwrap;
 
 /***/ },
-/* 55 */
+/* 57 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/bind.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 35);
+	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 37);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Creates a function that is bound to a context.
@@ -21943,15 +22054,15 @@ this["dash_composed"] =
 	module.exports = bind;
 
 /***/ },
-/* 56 */
+/* 58 */
 /*!***************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xmap.js ***!
   \***************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XMap = /*#__PURE__*/function () {
 	
@@ -21974,17 +22085,17 @@ this["dash_composed"] =
 	module.exports = _xmap;
 
 /***/ },
-/* 57 */
+/* 59 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/keys.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 60);
 	
-	var _isArguments = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArguments */ 59);
+	var _isArguments = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArguments */ 61);
 	
 	// cover IE < 9 keys issues
 	
@@ -22057,7 +22168,7 @@ this["dash_composed"] =
 	module.exports = keys;
 
 /***/ },
-/* 58 */
+/* 60 */
 /*!**************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_has.js ***!
   \**************************************************************************/
@@ -22069,13 +22180,13 @@ this["dash_composed"] =
 	module.exports = _has;
 
 /***/ },
-/* 59 */
+/* 61 */
 /*!**********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_isArguments.js ***!
   \**********************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./_has */ 60);
 	
 	var toString = Object.prototype.toString;
 	var _isArguments = function () {
@@ -22089,15 +22200,15 @@ this["dash_composed"] =
 	module.exports = _isArguments;
 
 /***/ },
-/* 60 */
+/* 62 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/prop.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var path = /*#__PURE__*/__webpack_require__(/*! ./path */ 61);
+	var path = /*#__PURE__*/__webpack_require__(/*! ./path */ 63);
 	
 	/**
 	 * Returns a function that when supplied an object returns the indicated
@@ -22124,13 +22235,13 @@ this["dash_composed"] =
 	module.exports = prop;
 
 /***/ },
-/* 61 */
+/* 63 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/path.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Retrieve the value at a given path.
@@ -22167,15 +22278,15 @@ this["dash_composed"] =
 	module.exports = path;
 
 /***/ },
-/* 62 */
+/* 64 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/reduce.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 51);
+	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 53);
 	
 	/**
 	 * Returns a single item by iterating through the list, successively calling
@@ -22229,13 +22340,13 @@ this["dash_composed"] =
 	module.exports = reduce;
 
 /***/ },
-/* 63 */
+/* 65 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/and.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns `true` if both arguments are `true`; `false` otherwise.
@@ -22264,17 +22375,17 @@ this["dash_composed"] =
 	module.exports = and;
 
 /***/ },
-/* 64 */
+/* 66 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/any.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xany = /*#__PURE__*/__webpack_require__(/*! ./internal/_xany */ 65);
+	var _xany = /*#__PURE__*/__webpack_require__(/*! ./internal/_xany */ 67);
 	
 	/**
 	 * Returns `true` if at least one of elements of the list match the predicate,
@@ -22316,17 +22427,17 @@ this["dash_composed"] =
 	module.exports = any;
 
 /***/ },
-/* 65 */
+/* 67 */
 /*!***************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xany.js ***!
   \***************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./_reduced */ 44);
+	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./_reduced */ 46);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XAny = /*#__PURE__*/function () {
 	
@@ -22359,21 +22470,21 @@ this["dash_composed"] =
 	module.exports = _xany;
 
 /***/ },
-/* 66 */
+/* 68 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/anyPass.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
-	var max = /*#__PURE__*/__webpack_require__(/*! ./max */ 47);
+	var max = /*#__PURE__*/__webpack_require__(/*! ./max */ 49);
 	
-	var pluck = /*#__PURE__*/__webpack_require__(/*! ./pluck */ 48);
+	var pluck = /*#__PURE__*/__webpack_require__(/*! ./pluck */ 50);
 	
-	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 62);
+	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 64);
 	
 	/**
 	 * Takes a list of predicates and returns a predicate that returns true for a
@@ -22419,19 +22530,19 @@ this["dash_composed"] =
 	module.exports = anyPass;
 
 /***/ },
-/* 67 */
+/* 69 */
 /*!***************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/ap.js ***!
   \***************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 33);
+	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 35);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 51);
+	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 53);
 	
-	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 49);
+	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 51);
 	
 	/**
 	 * ap applies a list of functions to a list of values.
@@ -22473,19 +22584,19 @@ this["dash_composed"] =
 	module.exports = ap;
 
 /***/ },
-/* 68 */
+/* 70 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/aperture.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _aperture = /*#__PURE__*/__webpack_require__(/*! ./internal/_aperture */ 69);
+	var _aperture = /*#__PURE__*/__webpack_require__(/*! ./internal/_aperture */ 71);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xaperture = /*#__PURE__*/__webpack_require__(/*! ./internal/_xaperture */ 70);
+	var _xaperture = /*#__PURE__*/__webpack_require__(/*! ./internal/_xaperture */ 72);
 	
 	/**
 	 * Returns a new list, composed of n-tuples of consecutive elements. If `n` is
@@ -22514,7 +22625,7 @@ this["dash_composed"] =
 	module.exports = aperture;
 
 /***/ },
-/* 69 */
+/* 71 */
 /*!*******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_aperture.js ***!
   \*******************************************************************************/
@@ -22533,17 +22644,17 @@ this["dash_composed"] =
 	module.exports = _aperture;
 
 /***/ },
-/* 70 */
+/* 72 */
 /*!********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xaperture.js ***!
   \********************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _concat = /*#__PURE__*/__webpack_require__(/*! ./_concat */ 33);
+	var _concat = /*#__PURE__*/__webpack_require__(/*! ./_concat */ 35);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XAperture = /*#__PURE__*/function () {
 	
@@ -22583,15 +22694,15 @@ this["dash_composed"] =
 	module.exports = _xaperture;
 
 /***/ },
-/* 71 */
+/* 73 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/append.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 33);
+	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 35);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns a new list containing the contents of the given list, followed by
@@ -22621,13 +22732,13 @@ this["dash_composed"] =
 	module.exports = append;
 
 /***/ },
-/* 72 */
+/* 74 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/apply.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Applies function `fn` to the argument list `args`. This is useful for
@@ -22657,27 +22768,27 @@ this["dash_composed"] =
 	module.exports = apply;
 
 /***/ },
-/* 73 */
+/* 75 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/applySpec.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var apply = /*#__PURE__*/__webpack_require__(/*! ./apply */ 72);
+	var apply = /*#__PURE__*/__webpack_require__(/*! ./apply */ 74);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
-	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 49);
+	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 51);
 	
-	var max = /*#__PURE__*/__webpack_require__(/*! ./max */ 47);
+	var max = /*#__PURE__*/__webpack_require__(/*! ./max */ 49);
 	
-	var pluck = /*#__PURE__*/__webpack_require__(/*! ./pluck */ 48);
+	var pluck = /*#__PURE__*/__webpack_require__(/*! ./pluck */ 50);
 	
-	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 62);
+	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 64);
 	
-	var values = /*#__PURE__*/__webpack_require__(/*! ./values */ 74);
+	var values = /*#__PURE__*/__webpack_require__(/*! ./values */ 76);
 	
 	/**
 	 * Given a spec object recursively mapping properties to functions, creates a
@@ -22720,15 +22831,15 @@ this["dash_composed"] =
 	module.exports = applySpec;
 
 /***/ },
-/* 74 */
+/* 76 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/values.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 57);
+	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 59);
 	
 	/**
 	 * Returns a list of all the enumerable own properties of the supplied object.
@@ -22763,13 +22874,13 @@ this["dash_composed"] =
 	module.exports = values;
 
 /***/ },
-/* 75 */
+/* 77 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/applyTo.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	* Takes a value and applies a function to it.
@@ -22798,13 +22909,13 @@ this["dash_composed"] =
 	module.exports = applyTo;
 
 /***/ },
-/* 76 */
+/* 78 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/ascend.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Makes an ascending comparator function out of a function that returns a value
@@ -22838,13 +22949,13 @@ this["dash_composed"] =
 	module.exports = ascend;
 
 /***/ },
-/* 77 */
+/* 79 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/assoc.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Makes a shallow clone of an object, setting or overriding the specified
@@ -22879,23 +22990,23 @@ this["dash_composed"] =
 	module.exports = assoc;
 
 /***/ },
-/* 78 */
+/* 80 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/assocPath.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 60);
 	
-	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArray */ 41);
+	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArray */ 43);
 	
-	var _isInteger = /*#__PURE__*/__webpack_require__(/*! ./internal/_isInteger */ 79);
+	var _isInteger = /*#__PURE__*/__webpack_require__(/*! ./internal/_isInteger */ 81);
 	
-	var assoc = /*#__PURE__*/__webpack_require__(/*! ./assoc */ 77);
+	var assoc = /*#__PURE__*/__webpack_require__(/*! ./assoc */ 79);
 	
-	var isNil = /*#__PURE__*/__webpack_require__(/*! ./isNil */ 80);
+	var isNil = /*#__PURE__*/__webpack_require__(/*! ./isNil */ 82);
 	
 	/**
 	 * Makes a shallow clone of an object, setting or overriding the nodes required
@@ -22943,7 +23054,7 @@ this["dash_composed"] =
 	module.exports = assocPath;
 
 /***/ },
-/* 79 */
+/* 81 */
 /*!********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_isInteger.js ***!
   \********************************************************************************/
@@ -22962,13 +23073,13 @@ this["dash_composed"] =
 	};
 
 /***/ },
-/* 80 */
+/* 82 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/isNil.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Checks if the input value is `null` or `undefined`.
@@ -22995,15 +23106,15 @@ this["dash_composed"] =
 	module.exports = isNil;
 
 /***/ },
-/* 81 */
+/* 83 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/binary.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var nAry = /*#__PURE__*/__webpack_require__(/*! ./nAry */ 82);
+	var nAry = /*#__PURE__*/__webpack_require__(/*! ./nAry */ 84);
 	
 	/**
 	 * Wraps a function of any arity (including nullary) in a function that accepts
@@ -23041,13 +23152,13 @@ this["dash_composed"] =
 	module.exports = binary;
 
 /***/ },
-/* 82 */
+/* 84 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/nAry.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Wraps a function of any arity (including nullary) in a function that accepts
@@ -23134,19 +23245,19 @@ this["dash_composed"] =
 	module.exports = nAry;
 
 /***/ },
-/* 83 */
+/* 85 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/both.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _isFunction = /*#__PURE__*/__webpack_require__(/*! ./internal/_isFunction */ 84);
+	var _isFunction = /*#__PURE__*/__webpack_require__(/*! ./internal/_isFunction */ 86);
 	
-	var and = /*#__PURE__*/__webpack_require__(/*! ./and */ 63);
+	var and = /*#__PURE__*/__webpack_require__(/*! ./and */ 65);
 	
-	var lift = /*#__PURE__*/__webpack_require__(/*! ./lift */ 85);
+	var lift = /*#__PURE__*/__webpack_require__(/*! ./lift */ 87);
 	
 	/**
 	 * A function which calls the two provided functions and returns the `&&`
@@ -23186,7 +23297,7 @@ this["dash_composed"] =
 	module.exports = both;
 
 /***/ },
-/* 84 */
+/* 86 */
 /*!*********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_isFunction.js ***!
   \*********************************************************************************/
@@ -23198,15 +23309,15 @@ this["dash_composed"] =
 	module.exports = _isFunction;
 
 /***/ },
-/* 85 */
+/* 87 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/lift.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var liftN = /*#__PURE__*/__webpack_require__(/*! ./liftN */ 86);
+	var liftN = /*#__PURE__*/__webpack_require__(/*! ./liftN */ 88);
 	
 	/**
 	 * "lifts" a function of arity > 1 so that it may "map over" a list, Function or other
@@ -23238,21 +23349,21 @@ this["dash_composed"] =
 	module.exports = lift;
 
 /***/ },
-/* 86 */
+/* 88 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/liftN.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 51);
+	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 53);
 	
-	var ap = /*#__PURE__*/__webpack_require__(/*! ./ap */ 67);
+	var ap = /*#__PURE__*/__webpack_require__(/*! ./ap */ 69);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
-	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 49);
+	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 51);
 	
 	/**
 	 * "lifts" a function to be the specified arity, so that it may "map over" that
@@ -23282,13 +23393,13 @@ this["dash_composed"] =
 	module.exports = liftN;
 
 /***/ },
-/* 87 */
+/* 89 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/call.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var curry = /*#__PURE__*/__webpack_require__(/*! ./curry */ 88);
+	var curry = /*#__PURE__*/__webpack_require__(/*! ./curry */ 90);
 	
 	/**
 	 * Returns the result of calling its first argument with the remaining
@@ -23330,15 +23441,15 @@ this["dash_composed"] =
 	module.exports = call;
 
 /***/ },
-/* 88 */
+/* 90 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/curry.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
 	/**
 	 * Returns a curried equivalent of the provided function. The curried function
@@ -23389,21 +23500,21 @@ this["dash_composed"] =
 	module.exports = curry;
 
 /***/ },
-/* 89 */
+/* 91 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/chain.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _makeFlat = /*#__PURE__*/__webpack_require__(/*! ./internal/_makeFlat */ 90);
+	var _makeFlat = /*#__PURE__*/__webpack_require__(/*! ./internal/_makeFlat */ 92);
 	
-	var _xchain = /*#__PURE__*/__webpack_require__(/*! ./internal/_xchain */ 91);
+	var _xchain = /*#__PURE__*/__webpack_require__(/*! ./internal/_xchain */ 93);
 	
-	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 49);
+	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 51);
 	
 	/**
 	 * `chain` maps a function over a list and concatenates the results. `chain`
@@ -23440,13 +23551,13 @@ this["dash_composed"] =
 	module.exports = chain;
 
 /***/ },
-/* 90 */
+/* 92 */
 /*!*******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_makeFlat.js ***!
   \*******************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _isArrayLike = /*#__PURE__*/__webpack_require__(/*! ./_isArrayLike */ 52);
+	var _isArrayLike = /*#__PURE__*/__webpack_require__(/*! ./_isArrayLike */ 54);
 	
 	/**
 	 * `_makeFlat` is a helper function that returns a one-level or fully recursive
@@ -23483,17 +23594,17 @@ this["dash_composed"] =
 	module.exports = _makeFlat;
 
 /***/ },
-/* 91 */
+/* 93 */
 /*!*****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xchain.js ***!
   \*****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _flatCat = /*#__PURE__*/__webpack_require__(/*! ./_flatCat */ 92);
+	var _flatCat = /*#__PURE__*/__webpack_require__(/*! ./_flatCat */ 94);
 	
-	var map = /*#__PURE__*/__webpack_require__(/*! ../map */ 49);
+	var map = /*#__PURE__*/__webpack_require__(/*! ../map */ 51);
 	
 	var _xchain = /*#__PURE__*/_curry2(function _xchain(f, xf) {
 	  return map(f, _flatCat(xf));
@@ -23501,19 +23612,19 @@ this["dash_composed"] =
 	module.exports = _xchain;
 
 /***/ },
-/* 92 */
+/* 94 */
 /*!******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_flatCat.js ***!
   \******************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _forceReduced = /*#__PURE__*/__webpack_require__(/*! ./_forceReduced */ 93);
+	var _forceReduced = /*#__PURE__*/__webpack_require__(/*! ./_forceReduced */ 95);
 	
-	var _isArrayLike = /*#__PURE__*/__webpack_require__(/*! ./_isArrayLike */ 52);
+	var _isArrayLike = /*#__PURE__*/__webpack_require__(/*! ./_isArrayLike */ 54);
 	
-	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./_reduce */ 51);
+	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./_reduce */ 53);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var preservingReduced = function (xf) {
 	  return {
@@ -23544,7 +23655,7 @@ this["dash_composed"] =
 	module.exports = _flatCat;
 
 /***/ },
-/* 93 */
+/* 95 */
 /*!***********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_forceReduced.js ***!
   \***********************************************************************************/
@@ -23559,13 +23670,13 @@ this["dash_composed"] =
 	module.exports = _forceReduced;
 
 /***/ },
-/* 94 */
+/* 96 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/clamp.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Restricts a number to be within a range.
@@ -23598,15 +23709,15 @@ this["dash_composed"] =
 	module.exports = clamp;
 
 /***/ },
-/* 95 */
+/* 97 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/clone.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _clone = /*#__PURE__*/__webpack_require__(/*! ./internal/_clone */ 96);
+	var _clone = /*#__PURE__*/__webpack_require__(/*! ./internal/_clone */ 98);
 	
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Creates a deep copy of the value which may contain (nested) `Array`s and
@@ -23637,15 +23748,15 @@ this["dash_composed"] =
 	module.exports = clone;
 
 /***/ },
-/* 96 */
+/* 98 */
 /*!****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_clone.js ***!
   \****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _cloneRegExp = /*#__PURE__*/__webpack_require__(/*! ./_cloneRegExp */ 97);
+	var _cloneRegExp = /*#__PURE__*/__webpack_require__(/*! ./_cloneRegExp */ 99);
 	
-	var type = /*#__PURE__*/__webpack_require__(/*! ../type */ 98);
+	var type = /*#__PURE__*/__webpack_require__(/*! ../type */ 100);
 	
 	/**
 	 * Copies an object.
@@ -23692,7 +23803,7 @@ this["dash_composed"] =
 	module.exports = _clone;
 
 /***/ },
-/* 97 */
+/* 99 */
 /*!**********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_cloneRegExp.js ***!
   \**********************************************************************************/
@@ -23704,13 +23815,13 @@ this["dash_composed"] =
 	module.exports = _cloneRegExp;
 
 /***/ },
-/* 98 */
+/* 100 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/type.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Gives a single-word string description of the (native) type of a value,
@@ -23745,13 +23856,13 @@ this["dash_composed"] =
 	module.exports = type;
 
 /***/ },
-/* 99 */
+/* 101 */
 /*!***********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/comparator.js ***!
   \***********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Makes a comparator function out of a function that reports whether the first
@@ -23783,15 +23894,15 @@ this["dash_composed"] =
 	module.exports = comparator;
 
 /***/ },
-/* 100 */
+/* 102 */
 /*!***********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/complement.js ***!
   \***********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var lift = /*#__PURE__*/__webpack_require__(/*! ./lift */ 85);
+	var lift = /*#__PURE__*/__webpack_require__(/*! ./lift */ 87);
 	
-	var not = /*#__PURE__*/__webpack_require__(/*! ./not */ 101);
+	var not = /*#__PURE__*/__webpack_require__(/*! ./not */ 103);
 	
 	/**
 	 * Takes a function `f` and returns a function `g` such that if called with the same arguments
@@ -23821,13 +23932,13 @@ this["dash_composed"] =
 	module.exports = complement;
 
 /***/ },
-/* 101 */
+/* 103 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/not.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * A function that returns the `!` of its argument. It will return `true` when
@@ -23856,15 +23967,15 @@ this["dash_composed"] =
 	module.exports = not;
 
 /***/ },
-/* 102 */
+/* 104 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/compose.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var pipe = /*#__PURE__*/__webpack_require__(/*! ./pipe */ 103);
+	var pipe = /*#__PURE__*/__webpack_require__(/*! ./pipe */ 105);
 	
-	var reverse = /*#__PURE__*/__webpack_require__(/*! ./reverse */ 108);
+	var reverse = /*#__PURE__*/__webpack_require__(/*! ./reverse */ 110);
 	
 	/**
 	 * Performs right-to-left function composition. The rightmost function may have
@@ -23901,19 +24012,19 @@ this["dash_composed"] =
 	module.exports = compose;
 
 /***/ },
-/* 103 */
+/* 105 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/pipe.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 35);
+	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 37);
 	
-	var _pipe = /*#__PURE__*/__webpack_require__(/*! ./internal/_pipe */ 104);
+	var _pipe = /*#__PURE__*/__webpack_require__(/*! ./internal/_pipe */ 106);
 	
-	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 62);
+	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 64);
 	
-	var tail = /*#__PURE__*/__webpack_require__(/*! ./tail */ 105);
+	var tail = /*#__PURE__*/__webpack_require__(/*! ./tail */ 107);
 	
 	/**
 	 * Performs left-to-right function composition. The leftmost function may have
@@ -23949,7 +24060,7 @@ this["dash_composed"] =
 	module.exports = pipe;
 
 /***/ },
-/* 104 */
+/* 106 */
 /*!***************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_pipe.js ***!
   \***************************************************************************/
@@ -23963,17 +24074,17 @@ this["dash_composed"] =
 	module.exports = _pipe;
 
 /***/ },
-/* 105 */
+/* 107 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/tail.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _checkForMethod = /*#__PURE__*/__webpack_require__(/*! ./internal/_checkForMethod */ 106);
+	var _checkForMethod = /*#__PURE__*/__webpack_require__(/*! ./internal/_checkForMethod */ 108);
 	
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 107);
+	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 109);
 	
 	/**
 	 * Returns all but the first element of the given list or string (or object
@@ -24008,13 +24119,13 @@ this["dash_composed"] =
 	module.exports = tail;
 
 /***/ },
-/* 106 */
+/* 108 */
 /*!*************************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_checkForMethod.js ***!
   \*************************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./_isArray */ 41);
+	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./_isArray */ 43);
 	
 	/**
 	 * This checks whether a function has a [methodname] function. If it isn't an
@@ -24041,15 +24152,15 @@ this["dash_composed"] =
 	module.exports = _checkForMethod;
 
 /***/ },
-/* 107 */
+/* 109 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/slice.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _checkForMethod = /*#__PURE__*/__webpack_require__(/*! ./internal/_checkForMethod */ 106);
+	var _checkForMethod = /*#__PURE__*/__webpack_require__(/*! ./internal/_checkForMethod */ 108);
 	
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Returns the elements of the given list or string (or object with a `slice`
@@ -24083,15 +24194,15 @@ this["dash_composed"] =
 	module.exports = slice;
 
 /***/ },
-/* 108 */
+/* 110 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/reverse.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var _isString = /*#__PURE__*/__webpack_require__(/*! ./internal/_isString */ 53);
+	var _isString = /*#__PURE__*/__webpack_require__(/*! ./internal/_isString */ 55);
 	
 	/**
 	 * Returns a new list or string with the elements or characters in reverse
@@ -24125,17 +24236,17 @@ this["dash_composed"] =
 	module.exports = reverse;
 
 /***/ },
-/* 109 */
+/* 111 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/composeK.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var chain = /*#__PURE__*/__webpack_require__(/*! ./chain */ 89);
+	var chain = /*#__PURE__*/__webpack_require__(/*! ./chain */ 91);
 	
-	var compose = /*#__PURE__*/__webpack_require__(/*! ./compose */ 102);
+	var compose = /*#__PURE__*/__webpack_require__(/*! ./compose */ 104);
 	
-	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 49);
+	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 51);
 	
 	/**
 	 * Returns the right-to-left Kleisli composition of the provided functions,
@@ -24180,15 +24291,15 @@ this["dash_composed"] =
 	module.exports = composeK;
 
 /***/ },
-/* 110 */
+/* 112 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/composeP.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var pipeP = /*#__PURE__*/__webpack_require__(/*! ./pipeP */ 111);
+	var pipeP = /*#__PURE__*/__webpack_require__(/*! ./pipeP */ 113);
 	
-	var reverse = /*#__PURE__*/__webpack_require__(/*! ./reverse */ 108);
+	var reverse = /*#__PURE__*/__webpack_require__(/*! ./reverse */ 110);
 	
 	/**
 	 * Performs right-to-left composition of one or more Promise-returning
@@ -24235,19 +24346,19 @@ this["dash_composed"] =
 	module.exports = composeP;
 
 /***/ },
-/* 111 */
+/* 113 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/pipeP.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 35);
+	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 37);
 	
-	var _pipeP = /*#__PURE__*/__webpack_require__(/*! ./internal/_pipeP */ 112);
+	var _pipeP = /*#__PURE__*/__webpack_require__(/*! ./internal/_pipeP */ 114);
 	
-	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 62);
+	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 64);
 	
-	var tail = /*#__PURE__*/__webpack_require__(/*! ./tail */ 105);
+	var tail = /*#__PURE__*/__webpack_require__(/*! ./tail */ 107);
 	
 	/**
 	 * Performs left-to-right composition of one or more Promise-returning
@@ -24278,7 +24389,7 @@ this["dash_composed"] =
 	module.exports = pipeP;
 
 /***/ },
-/* 112 */
+/* 114 */
 /*!****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_pipeP.js ***!
   \****************************************************************************/
@@ -24295,21 +24406,21 @@ this["dash_composed"] =
 	module.exports = _pipeP;
 
 /***/ },
-/* 113 */
+/* 115 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/concat.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArray */ 41);
+	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArray */ 43);
 	
-	var _isFunction = /*#__PURE__*/__webpack_require__(/*! ./internal/_isFunction */ 84);
+	var _isFunction = /*#__PURE__*/__webpack_require__(/*! ./internal/_isFunction */ 86);
 	
-	var _isString = /*#__PURE__*/__webpack_require__(/*! ./internal/_isString */ 53);
+	var _isString = /*#__PURE__*/__webpack_require__(/*! ./internal/_isString */ 55);
 	
-	var toString = /*#__PURE__*/__webpack_require__(/*! ./toString */ 114);
+	var toString = /*#__PURE__*/__webpack_require__(/*! ./toString */ 116);
 	
 	/**
 	 * Returns the result of concatenating the given lists or strings.
@@ -24365,15 +24476,15 @@ this["dash_composed"] =
 	module.exports = concat;
 
 /***/ },
-/* 114 */
+/* 116 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/toString.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var _toString = /*#__PURE__*/__webpack_require__(/*! ./internal/_toString */ 115);
+	var _toString = /*#__PURE__*/__webpack_require__(/*! ./internal/_toString */ 117);
 	
 	/**
 	 * Returns the string representation of the given value. `eval`'ing the output
@@ -24419,23 +24530,23 @@ this["dash_composed"] =
 	module.exports = toString;
 
 /***/ },
-/* 115 */
+/* 117 */
 /*!*******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_toString.js ***!
   \*******************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _contains = /*#__PURE__*/__webpack_require__(/*! ./_contains */ 116);
+	var _contains = /*#__PURE__*/__webpack_require__(/*! ./_contains */ 118);
 	
-	var _map = /*#__PURE__*/__webpack_require__(/*! ./_map */ 50);
+	var _map = /*#__PURE__*/__webpack_require__(/*! ./_map */ 52);
 	
-	var _quote = /*#__PURE__*/__webpack_require__(/*! ./_quote */ 124);
+	var _quote = /*#__PURE__*/__webpack_require__(/*! ./_quote */ 126);
 	
-	var _toISOString = /*#__PURE__*/__webpack_require__(/*! ./_toISOString */ 125);
+	var _toISOString = /*#__PURE__*/__webpack_require__(/*! ./_toISOString */ 127);
 	
-	var keys = /*#__PURE__*/__webpack_require__(/*! ../keys */ 57);
+	var keys = /*#__PURE__*/__webpack_require__(/*! ../keys */ 59);
 	
-	var reject = /*#__PURE__*/__webpack_require__(/*! ../reject */ 126);
+	var reject = /*#__PURE__*/__webpack_require__(/*! ../reject */ 128);
 	
 	function _toString(x, seen) {
 	  var recur = function recur(y) {
@@ -24483,13 +24594,13 @@ this["dash_composed"] =
 	module.exports = _toString;
 
 /***/ },
-/* 116 */
+/* 118 */
 /*!*******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_contains.js ***!
   \*******************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _indexOf = /*#__PURE__*/__webpack_require__(/*! ./_indexOf */ 117);
+	var _indexOf = /*#__PURE__*/__webpack_require__(/*! ./_indexOf */ 119);
 	
 	function _contains(a, list) {
 	  return _indexOf(list, a, 0) >= 0;
@@ -24497,13 +24608,13 @@ this["dash_composed"] =
 	module.exports = _contains;
 
 /***/ },
-/* 117 */
+/* 119 */
 /*!******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_indexOf.js ***!
   \******************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var equals = /*#__PURE__*/__webpack_require__(/*! ../equals */ 118);
+	var equals = /*#__PURE__*/__webpack_require__(/*! ../equals */ 120);
 	
 	function _indexOf(list, a, idx) {
 	  var inf, item;
@@ -24562,15 +24673,15 @@ this["dash_composed"] =
 	module.exports = _indexOf;
 
 /***/ },
-/* 118 */
+/* 120 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/equals.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _equals = /*#__PURE__*/__webpack_require__(/*! ./internal/_equals */ 119);
+	var _equals = /*#__PURE__*/__webpack_require__(/*! ./internal/_equals */ 121);
 	
 	/**
 	 * Returns `true` if its arguments are equivalent, `false` otherwise. Handles
@@ -24605,25 +24716,25 @@ this["dash_composed"] =
 	module.exports = equals;
 
 /***/ },
-/* 119 */
+/* 121 */
 /*!*****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_equals.js ***!
   \*****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _arrayFromIterator = /*#__PURE__*/__webpack_require__(/*! ./_arrayFromIterator */ 120);
+	var _arrayFromIterator = /*#__PURE__*/__webpack_require__(/*! ./_arrayFromIterator */ 122);
 	
-	var _containsWith = /*#__PURE__*/__webpack_require__(/*! ./_containsWith */ 121);
+	var _containsWith = /*#__PURE__*/__webpack_require__(/*! ./_containsWith */ 123);
 	
-	var _functionName = /*#__PURE__*/__webpack_require__(/*! ./_functionName */ 122);
+	var _functionName = /*#__PURE__*/__webpack_require__(/*! ./_functionName */ 124);
 	
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./_has */ 60);
 	
-	var identical = /*#__PURE__*/__webpack_require__(/*! ../identical */ 123);
+	var identical = /*#__PURE__*/__webpack_require__(/*! ../identical */ 125);
 	
-	var keys = /*#__PURE__*/__webpack_require__(/*! ../keys */ 57);
+	var keys = /*#__PURE__*/__webpack_require__(/*! ../keys */ 59);
 	
-	var type = /*#__PURE__*/__webpack_require__(/*! ../type */ 98);
+	var type = /*#__PURE__*/__webpack_require__(/*! ../type */ 100);
 	
 	/**
 	 * private _uniqContentEquals function.
@@ -24769,7 +24880,7 @@ this["dash_composed"] =
 	module.exports = _equals;
 
 /***/ },
-/* 120 */
+/* 122 */
 /*!****************************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_arrayFromIterator.js ***!
   \****************************************************************************************/
@@ -24786,7 +24897,7 @@ this["dash_composed"] =
 	module.exports = _arrayFromIterator;
 
 /***/ },
-/* 121 */
+/* 123 */
 /*!***********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_containsWith.js ***!
   \***********************************************************************************/
@@ -24807,7 +24918,7 @@ this["dash_composed"] =
 	module.exports = _containsWith;
 
 /***/ },
-/* 122 */
+/* 124 */
 /*!***********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_functionName.js ***!
   \***********************************************************************************/
@@ -24821,13 +24932,13 @@ this["dash_composed"] =
 	module.exports = _functionName;
 
 /***/ },
-/* 123 */
+/* 125 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/identical.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns true if its arguments are identical, false otherwise. Values are
@@ -24868,7 +24979,7 @@ this["dash_composed"] =
 	module.exports = identical;
 
 /***/ },
-/* 124 */
+/* 126 */
 /*!****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_quote.js ***!
   \****************************************************************************/
@@ -24883,7 +24994,7 @@ this["dash_composed"] =
 	module.exports = _quote;
 
 /***/ },
-/* 125 */
+/* 127 */
 /*!**********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_toISOString.js ***!
   \**********************************************************************************/
@@ -24905,17 +25016,17 @@ this["dash_composed"] =
 	module.exports = _toISOString;
 
 /***/ },
-/* 126 */
+/* 128 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/reject.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _complement = /*#__PURE__*/__webpack_require__(/*! ./internal/_complement */ 127);
+	var _complement = /*#__PURE__*/__webpack_require__(/*! ./internal/_complement */ 129);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var filter = /*#__PURE__*/__webpack_require__(/*! ./filter */ 128);
+	var filter = /*#__PURE__*/__webpack_require__(/*! ./filter */ 130);
 	
 	/**
 	 * The complement of [`filter`](#filter).
@@ -24949,7 +25060,7 @@ this["dash_composed"] =
 	module.exports = reject;
 
 /***/ },
-/* 127 */
+/* 129 */
 /*!*********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_complement.js ***!
   \*********************************************************************************/
@@ -24963,25 +25074,25 @@ this["dash_composed"] =
 	module.exports = _complement;
 
 /***/ },
-/* 128 */
+/* 130 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/filter.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _filter = /*#__PURE__*/__webpack_require__(/*! ./internal/_filter */ 129);
+	var _filter = /*#__PURE__*/__webpack_require__(/*! ./internal/_filter */ 131);
 	
-	var _isObject = /*#__PURE__*/__webpack_require__(/*! ./internal/_isObject */ 130);
+	var _isObject = /*#__PURE__*/__webpack_require__(/*! ./internal/_isObject */ 132);
 	
-	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 51);
+	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 53);
 	
-	var _xfilter = /*#__PURE__*/__webpack_require__(/*! ./internal/_xfilter */ 131);
+	var _xfilter = /*#__PURE__*/__webpack_require__(/*! ./internal/_xfilter */ 133);
 	
-	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 57);
+	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 59);
 	
 	/**
 	 * Takes a predicate and a `Filterable`, and returns a new filterable of the
@@ -25025,7 +25136,7 @@ this["dash_composed"] =
 	module.exports = filter;
 
 /***/ },
-/* 129 */
+/* 131 */
 /*!*****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_filter.js ***!
   \*****************************************************************************/
@@ -25047,7 +25158,7 @@ this["dash_composed"] =
 	module.exports = _filter;
 
 /***/ },
-/* 130 */
+/* 132 */
 /*!*******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_isObject.js ***!
   \*******************************************************************************/
@@ -25059,15 +25170,15 @@ this["dash_composed"] =
 	module.exports = _isObject;
 
 /***/ },
-/* 131 */
+/* 133 */
 /*!******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xfilter.js ***!
   \******************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XFilter = /*#__PURE__*/function () {
 	
@@ -25090,21 +25201,21 @@ this["dash_composed"] =
 	module.exports = _xfilter;
 
 /***/ },
-/* 132 */
+/* 134 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/cond.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 35);
+	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 37);
 	
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 49);
+	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 51);
 	
-	var max = /*#__PURE__*/__webpack_require__(/*! ./max */ 47);
+	var max = /*#__PURE__*/__webpack_require__(/*! ./max */ 49);
 	
-	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 62);
+	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 64);
 	
 	/**
 	 * Returns a function, `fn`, which encapsulates `if/else, if/else, ...` logic.
@@ -25151,15 +25262,15 @@ this["dash_composed"] =
 	module.exports = cond;
 
 /***/ },
-/* 133 */
+/* 135 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/construct.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var constructN = /*#__PURE__*/__webpack_require__(/*! ./constructN */ 134);
+	var constructN = /*#__PURE__*/__webpack_require__(/*! ./constructN */ 136);
 	
 	/**
 	 * Wraps a constructor function inside a curried function that can be called
@@ -25201,17 +25312,17 @@ this["dash_composed"] =
 	module.exports = construct;
 
 /***/ },
-/* 134 */
+/* 136 */
 /*!***********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/constructN.js ***!
   \***********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var curry = /*#__PURE__*/__webpack_require__(/*! ./curry */ 88);
+	var curry = /*#__PURE__*/__webpack_require__(/*! ./curry */ 90);
 	
-	var nAry = /*#__PURE__*/__webpack_require__(/*! ./nAry */ 82);
+	var nAry = /*#__PURE__*/__webpack_require__(/*! ./nAry */ 84);
 	
 	/**
 	 * Wraps a constructor function inside a curried function that can be called
@@ -25287,15 +25398,15 @@ this["dash_composed"] =
 	module.exports = constructN;
 
 /***/ },
-/* 135 */
+/* 137 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/contains.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _contains = /*#__PURE__*/__webpack_require__(/*! ./internal/_contains */ 116);
+	var _contains = /*#__PURE__*/__webpack_require__(/*! ./internal/_contains */ 118);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns `true` if the specified value is equal, in [`R.equals`](#equals)
@@ -25323,23 +25434,23 @@ this["dash_composed"] =
 	module.exports = contains;
 
 /***/ },
-/* 136 */
+/* 138 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/converge.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _map = /*#__PURE__*/__webpack_require__(/*! ./internal/_map */ 50);
+	var _map = /*#__PURE__*/__webpack_require__(/*! ./internal/_map */ 52);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
-	var max = /*#__PURE__*/__webpack_require__(/*! ./max */ 47);
+	var max = /*#__PURE__*/__webpack_require__(/*! ./max */ 49);
 	
-	var pluck = /*#__PURE__*/__webpack_require__(/*! ./pluck */ 48);
+	var pluck = /*#__PURE__*/__webpack_require__(/*! ./pluck */ 50);
 	
-	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 62);
+	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 64);
 	
 	/**
 	 * Accepts a converging function and a list of branching functions and returns
@@ -25382,13 +25493,13 @@ this["dash_composed"] =
 	module.exports = converge;
 
 /***/ },
-/* 137 */
+/* 139 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/countBy.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var reduceBy = /*#__PURE__*/__webpack_require__(/*! ./reduceBy */ 138);
+	var reduceBy = /*#__PURE__*/__webpack_require__(/*! ./reduceBy */ 140);
 	
 	/**
 	 * Counts the elements of a list according to how many match each value of a
@@ -25422,21 +25533,21 @@ this["dash_composed"] =
 	module.exports = countBy;
 
 /***/ },
-/* 138 */
+/* 140 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/reduceBy.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curryN = /*#__PURE__*/__webpack_require__(/*! ./internal/_curryN */ 36);
+	var _curryN = /*#__PURE__*/__webpack_require__(/*! ./internal/_curryN */ 38);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 60);
 	
-	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 51);
+	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 53);
 	
-	var _xreduceBy = /*#__PURE__*/__webpack_require__(/*! ./internal/_xreduceBy */ 139);
+	var _xreduceBy = /*#__PURE__*/__webpack_require__(/*! ./internal/_xreduceBy */ 141);
 	
 	/**
 	 * Groups the elements of the list according to the result of calling
@@ -25494,17 +25605,17 @@ this["dash_composed"] =
 	module.exports = reduceBy;
 
 /***/ },
-/* 139 */
+/* 141 */
 /*!********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xreduceBy.js ***!
   \********************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curryN = /*#__PURE__*/__webpack_require__(/*! ./_curryN */ 36);
+	var _curryN = /*#__PURE__*/__webpack_require__(/*! ./_curryN */ 38);
 	
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./_has */ 60);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XReduceBy = /*#__PURE__*/function () {
 	
@@ -25546,13 +25657,13 @@ this["dash_composed"] =
 	module.exports = _xreduceBy;
 
 /***/ },
-/* 140 */
+/* 142 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/dec.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var add = /*#__PURE__*/__webpack_require__(/*! ./add */ 30);
+	var add = /*#__PURE__*/__webpack_require__(/*! ./add */ 32);
 	
 	/**
 	 * Decrements its argument.
@@ -25575,13 +25686,13 @@ this["dash_composed"] =
 	module.exports = dec;
 
 /***/ },
-/* 141 */
+/* 143 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/defaultTo.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns the second argument if it is not `null`, `undefined` or `NaN`;
@@ -25613,13 +25724,13 @@ this["dash_composed"] =
 	module.exports = defaultTo;
 
 /***/ },
-/* 142 */
+/* 144 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/descend.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Makes a descending comparator function out of a function that returns a value
@@ -25653,15 +25764,15 @@ this["dash_composed"] =
 	module.exports = descend;
 
 /***/ },
-/* 143 */
+/* 145 */
 /*!***********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/difference.js ***!
   \***********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _contains = /*#__PURE__*/__webpack_require__(/*! ./internal/_contains */ 116);
+	var _contains = /*#__PURE__*/__webpack_require__(/*! ./internal/_contains */ 118);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Finds the set (i.e. no duplicates) of all elements in the first list not
@@ -25700,15 +25811,15 @@ this["dash_composed"] =
 	module.exports = difference;
 
 /***/ },
-/* 144 */
+/* 146 */
 /*!***************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/differenceWith.js ***!
   \***************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _containsWith = /*#__PURE__*/__webpack_require__(/*! ./internal/_containsWith */ 121);
+	var _containsWith = /*#__PURE__*/__webpack_require__(/*! ./internal/_containsWith */ 123);
 	
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Finds the set (i.e. no duplicates) of all elements in the first list not
@@ -25749,13 +25860,13 @@ this["dash_composed"] =
 	module.exports = differenceWith;
 
 /***/ },
-/* 145 */
+/* 147 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/dissoc.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns a new object that does not contain a `prop` property.
@@ -25786,23 +25897,23 @@ this["dash_composed"] =
 	module.exports = dissoc;
 
 /***/ },
-/* 146 */
+/* 148 */
 /*!***********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/dissocPath.js ***!
   \***********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _isInteger = /*#__PURE__*/__webpack_require__(/*! ./internal/_isInteger */ 79);
+	var _isInteger = /*#__PURE__*/__webpack_require__(/*! ./internal/_isInteger */ 81);
 	
-	var assoc = /*#__PURE__*/__webpack_require__(/*! ./assoc */ 77);
+	var assoc = /*#__PURE__*/__webpack_require__(/*! ./assoc */ 79);
 	
-	var dissoc = /*#__PURE__*/__webpack_require__(/*! ./dissoc */ 145);
+	var dissoc = /*#__PURE__*/__webpack_require__(/*! ./dissoc */ 147);
 	
-	var remove = /*#__PURE__*/__webpack_require__(/*! ./remove */ 147);
+	var remove = /*#__PURE__*/__webpack_require__(/*! ./remove */ 149);
 	
-	var update = /*#__PURE__*/__webpack_require__(/*! ./update */ 148);
+	var update = /*#__PURE__*/__webpack_require__(/*! ./update */ 150);
 	
 	/**
 	 * Makes a shallow clone of an object, omitting the property at the given path.
@@ -25846,13 +25957,13 @@ this["dash_composed"] =
 	module.exports = dissocPath;
 
 /***/ },
-/* 147 */
+/* 149 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/remove.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Removes the sub-list of `list` starting at index `start` and containing
@@ -25883,17 +25994,17 @@ this["dash_composed"] =
 	module.exports = remove;
 
 /***/ },
-/* 148 */
+/* 150 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/update.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var adjust = /*#__PURE__*/__webpack_require__(/*! ./adjust */ 37);
+	var adjust = /*#__PURE__*/__webpack_require__(/*! ./adjust */ 39);
 	
-	var always = /*#__PURE__*/__webpack_require__(/*! ./always */ 25);
+	var always = /*#__PURE__*/__webpack_require__(/*! ./always */ 27);
 	
 	/**
 	 * Returns a new copy of the array with the element at the provided index
@@ -25925,13 +26036,13 @@ this["dash_composed"] =
 	module.exports = update;
 
 /***/ },
-/* 149 */
+/* 151 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/divide.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Divides two numbers. Equivalent to `a / b`.
@@ -25963,19 +26074,19 @@ this["dash_composed"] =
 	module.exports = divide;
 
 /***/ },
-/* 150 */
+/* 152 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/drop.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xdrop = /*#__PURE__*/__webpack_require__(/*! ./internal/_xdrop */ 151);
+	var _xdrop = /*#__PURE__*/__webpack_require__(/*! ./internal/_xdrop */ 153);
 	
-	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 107);
+	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 109);
 	
 	/**
 	 * Returns all but the first `n` elements of the given list, string, or
@@ -26009,15 +26120,15 @@ this["dash_composed"] =
 	module.exports = drop;
 
 /***/ },
-/* 151 */
+/* 153 */
 /*!****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xdrop.js ***!
   \****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XDrop = /*#__PURE__*/function () {
 	
@@ -26044,19 +26155,19 @@ this["dash_composed"] =
 	module.exports = _xdrop;
 
 /***/ },
-/* 152 */
+/* 154 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/dropLast.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _dropLast = /*#__PURE__*/__webpack_require__(/*! ./internal/_dropLast */ 153);
+	var _dropLast = /*#__PURE__*/__webpack_require__(/*! ./internal/_dropLast */ 155);
 	
-	var _xdropLast = /*#__PURE__*/__webpack_require__(/*! ./internal/_xdropLast */ 156);
+	var _xdropLast = /*#__PURE__*/__webpack_require__(/*! ./internal/_xdropLast */ 158);
 	
 	/**
 	 * Returns a list containing all but the last `n` elements of the given `list`.
@@ -26085,13 +26196,13 @@ this["dash_composed"] =
 	module.exports = dropLast;
 
 /***/ },
-/* 153 */
+/* 155 */
 /*!*******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_dropLast.js ***!
   \*******************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var take = /*#__PURE__*/__webpack_require__(/*! ../take */ 154);
+	var take = /*#__PURE__*/__webpack_require__(/*! ../take */ 156);
 	
 	function dropLast(n, xs) {
 	  return take(n < xs.length ? xs.length - n : 0, xs);
@@ -26099,19 +26210,19 @@ this["dash_composed"] =
 	module.exports = dropLast;
 
 /***/ },
-/* 154 */
+/* 156 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/take.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xtake = /*#__PURE__*/__webpack_require__(/*! ./internal/_xtake */ 155);
+	var _xtake = /*#__PURE__*/__webpack_require__(/*! ./internal/_xtake */ 157);
 	
-	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 107);
+	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 109);
 	
 	/**
 	 * Returns the first `n` elements of the given list, string, or
@@ -26164,17 +26275,17 @@ this["dash_composed"] =
 	module.exports = take;
 
 /***/ },
-/* 155 */
+/* 157 */
 /*!****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xtake.js ***!
   \****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./_reduced */ 44);
+	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./_reduced */ 46);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XTake = /*#__PURE__*/function () {
 	
@@ -26200,15 +26311,15 @@ this["dash_composed"] =
 	module.exports = _xtake;
 
 /***/ },
-/* 156 */
+/* 158 */
 /*!********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xdropLast.js ***!
   \********************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XDropLast = /*#__PURE__*/function () {
 	
@@ -26248,19 +26359,19 @@ this["dash_composed"] =
 	module.exports = _xdropLast;
 
 /***/ },
-/* 157 */
+/* 159 */
 /*!**************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/dropLastWhile.js ***!
   \**************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _dropLastWhile = /*#__PURE__*/__webpack_require__(/*! ./internal/_dropLastWhile */ 158);
+	var _dropLastWhile = /*#__PURE__*/__webpack_require__(/*! ./internal/_dropLastWhile */ 160);
 	
-	var _xdropLastWhile = /*#__PURE__*/__webpack_require__(/*! ./internal/_xdropLastWhile */ 159);
+	var _xdropLastWhile = /*#__PURE__*/__webpack_require__(/*! ./internal/_xdropLastWhile */ 161);
 	
 	/**
 	 * Returns a new list excluding all the tailing elements of a given list which
@@ -26293,13 +26404,13 @@ this["dash_composed"] =
 	module.exports = dropLastWhile;
 
 /***/ },
-/* 158 */
+/* 160 */
 /*!************************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_dropLastWhile.js ***!
   \************************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var slice = /*#__PURE__*/__webpack_require__(/*! ../slice */ 107);
+	var slice = /*#__PURE__*/__webpack_require__(/*! ../slice */ 109);
 	
 	function dropLastWhile(pred, xs) {
 	  var idx = xs.length - 1;
@@ -26311,17 +26422,17 @@ this["dash_composed"] =
 	module.exports = dropLastWhile;
 
 /***/ },
-/* 159 */
+/* 161 */
 /*!*************************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xdropLastWhile.js ***!
   \*************************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./_reduce */ 51);
+	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./_reduce */ 53);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XDropLastWhile = /*#__PURE__*/function () {
 	
@@ -26357,21 +26468,21 @@ this["dash_composed"] =
 	module.exports = _xdropLastWhile;
 
 /***/ },
-/* 160 */
+/* 162 */
 /*!************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/dropRepeats.js ***!
   \************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xdropRepeatsWith = /*#__PURE__*/__webpack_require__(/*! ./internal/_xdropRepeatsWith */ 161);
+	var _xdropRepeatsWith = /*#__PURE__*/__webpack_require__(/*! ./internal/_xdropRepeatsWith */ 163);
 	
-	var dropRepeatsWith = /*#__PURE__*/__webpack_require__(/*! ./dropRepeatsWith */ 162);
+	var dropRepeatsWith = /*#__PURE__*/__webpack_require__(/*! ./dropRepeatsWith */ 164);
 	
-	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 118);
+	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 120);
 	
 	/**
 	 * Returns a new list without any consecutively repeating elements.
@@ -26397,15 +26508,15 @@ this["dash_composed"] =
 	module.exports = dropRepeats;
 
 /***/ },
-/* 161 */
+/* 163 */
 /*!***************************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xdropRepeatsWith.js ***!
   \***************************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XDropRepeatsWith = /*#__PURE__*/function () {
 	
@@ -26438,19 +26549,19 @@ this["dash_composed"] =
 	module.exports = _xdropRepeatsWith;
 
 /***/ },
-/* 162 */
+/* 164 */
 /*!****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/dropRepeatsWith.js ***!
   \****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xdropRepeatsWith = /*#__PURE__*/__webpack_require__(/*! ./internal/_xdropRepeatsWith */ 161);
+	var _xdropRepeatsWith = /*#__PURE__*/__webpack_require__(/*! ./internal/_xdropRepeatsWith */ 163);
 	
-	var last = /*#__PURE__*/__webpack_require__(/*! ./last */ 163);
+	var last = /*#__PURE__*/__webpack_require__(/*! ./last */ 165);
 	
 	/**
 	 * Returns a new list without any consecutively repeating elements. Equality is
@@ -26493,13 +26604,13 @@ this["dash_composed"] =
 	module.exports = dropRepeatsWith;
 
 /***/ },
-/* 163 */
+/* 165 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/last.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var nth = /*#__PURE__*/__webpack_require__(/*! ./nth */ 164);
+	var nth = /*#__PURE__*/__webpack_require__(/*! ./nth */ 166);
 	
 	/**
 	 * Returns the last element of the given list or string.
@@ -26527,15 +26638,15 @@ this["dash_composed"] =
 	module.exports = last;
 
 /***/ },
-/* 164 */
+/* 166 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/nth.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _isString = /*#__PURE__*/__webpack_require__(/*! ./internal/_isString */ 53);
+	var _isString = /*#__PURE__*/__webpack_require__(/*! ./internal/_isString */ 55);
 	
 	/**
 	 * Returns the nth element of the given list or string. If n is negative the
@@ -26572,19 +26683,19 @@ this["dash_composed"] =
 	module.exports = nth;
 
 /***/ },
-/* 165 */
+/* 167 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/dropWhile.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xdropWhile = /*#__PURE__*/__webpack_require__(/*! ./internal/_xdropWhile */ 166);
+	var _xdropWhile = /*#__PURE__*/__webpack_require__(/*! ./internal/_xdropWhile */ 168);
 	
-	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 107);
+	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 109);
 	
 	/**
 	 * Returns a new list excluding the leading elements of a given list which
@@ -26627,15 +26738,15 @@ this["dash_composed"] =
 	module.exports = dropWhile;
 
 /***/ },
-/* 166 */
+/* 168 */
 /*!*********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xdropWhile.js ***!
   \*********************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XDropWhile = /*#__PURE__*/function () {
 	
@@ -26664,19 +26775,19 @@ this["dash_composed"] =
 	module.exports = _xdropWhile;
 
 /***/ },
-/* 167 */
+/* 169 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/either.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _isFunction = /*#__PURE__*/__webpack_require__(/*! ./internal/_isFunction */ 84);
+	var _isFunction = /*#__PURE__*/__webpack_require__(/*! ./internal/_isFunction */ 86);
 	
-	var lift = /*#__PURE__*/__webpack_require__(/*! ./lift */ 85);
+	var lift = /*#__PURE__*/__webpack_require__(/*! ./lift */ 87);
 	
-	var or = /*#__PURE__*/__webpack_require__(/*! ./or */ 168);
+	var or = /*#__PURE__*/__webpack_require__(/*! ./or */ 170);
 	
 	/**
 	 * A function wrapping calls to the two functions in an `||` operation,
@@ -26715,13 +26826,13 @@ this["dash_composed"] =
 	module.exports = either;
 
 /***/ },
-/* 168 */
+/* 170 */
 /*!***************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/or.js ***!
   \***************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns `true` if one or both of its arguments are `true`. Returns `false`
@@ -26751,21 +26862,21 @@ this["dash_composed"] =
 	module.exports = or;
 
 /***/ },
-/* 169 */
+/* 171 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/empty.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var _isArguments = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArguments */ 59);
+	var _isArguments = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArguments */ 61);
 	
-	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArray */ 41);
+	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArray */ 43);
 	
-	var _isObject = /*#__PURE__*/__webpack_require__(/*! ./internal/_isObject */ 130);
+	var _isObject = /*#__PURE__*/__webpack_require__(/*! ./internal/_isObject */ 132);
 	
-	var _isString = /*#__PURE__*/__webpack_require__(/*! ./internal/_isString */ 53);
+	var _isString = /*#__PURE__*/__webpack_require__(/*! ./internal/_isString */ 55);
 	
 	/**
 	 * Returns the empty value of its argument's type. Ramda defines the empty
@@ -26802,17 +26913,17 @@ this["dash_composed"] =
 	module.exports = empty;
 
 /***/ },
-/* 170 */
+/* 172 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/endsWith.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 118);
+	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 120);
 	
-	var takeLast = /*#__PURE__*/__webpack_require__(/*! ./takeLast */ 171);
+	var takeLast = /*#__PURE__*/__webpack_require__(/*! ./takeLast */ 173);
 	
 	/**
 	 * Checks if a list ends with the provided values
@@ -26841,15 +26952,15 @@ this["dash_composed"] =
 	module.exports = endsWith;
 
 /***/ },
-/* 171 */
+/* 173 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/takeLast.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var drop = /*#__PURE__*/__webpack_require__(/*! ./drop */ 150);
+	var drop = /*#__PURE__*/__webpack_require__(/*! ./drop */ 152);
 	
 	/**
 	 * Returns a new list containing the last `n` elements of the given list.
@@ -26881,15 +26992,15 @@ this["dash_composed"] =
 	module.exports = takeLast;
 
 /***/ },
-/* 172 */
+/* 174 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/eqBy.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 118);
+	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 120);
 	
 	/**
 	 * Takes a function and two values in its domain and returns `true` if the
@@ -26916,15 +27027,15 @@ this["dash_composed"] =
 	module.exports = eqBy;
 
 /***/ },
-/* 173 */
+/* 175 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/eqProps.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 118);
+	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 120);
 	
 	/**
 	 * Reports whether two objects have the same value, in [`R.equals`](#equals)
@@ -26955,13 +27066,13 @@ this["dash_composed"] =
 	module.exports = eqProps;
 
 /***/ },
-/* 174 */
+/* 176 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/evolve.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Creates a new object by recursively evolving a shallow copy of `object`,
@@ -27005,17 +27116,17 @@ this["dash_composed"] =
 	module.exports = evolve;
 
 /***/ },
-/* 175 */
+/* 177 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/find.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xfind = /*#__PURE__*/__webpack_require__(/*! ./internal/_xfind */ 176);
+	var _xfind = /*#__PURE__*/__webpack_require__(/*! ./internal/_xfind */ 178);
 	
 	/**
 	 * Returns the first element of the list which matches the predicate, or
@@ -27056,17 +27167,17 @@ this["dash_composed"] =
 	module.exports = find;
 
 /***/ },
-/* 176 */
+/* 178 */
 /*!****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xfind.js ***!
   \****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./_reduced */ 44);
+	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./_reduced */ 46);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XFind = /*#__PURE__*/function () {
 	
@@ -27099,17 +27210,17 @@ this["dash_composed"] =
 	module.exports = _xfind;
 
 /***/ },
-/* 177 */
+/* 179 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/findIndex.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xfindIndex = /*#__PURE__*/__webpack_require__(/*! ./internal/_xfindIndex */ 178);
+	var _xfindIndex = /*#__PURE__*/__webpack_require__(/*! ./internal/_xfindIndex */ 180);
 	
 	/**
 	 * Returns the index of the first element of the list which matches the
@@ -27149,17 +27260,17 @@ this["dash_composed"] =
 	module.exports = findIndex;
 
 /***/ },
-/* 178 */
+/* 180 */
 /*!*********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xfindIndex.js ***!
   \*********************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./_reduced */ 44);
+	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./_reduced */ 46);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XFindIndex = /*#__PURE__*/function () {
 	
@@ -27194,17 +27305,17 @@ this["dash_composed"] =
 	module.exports = _xfindIndex;
 
 /***/ },
-/* 179 */
+/* 181 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/findLast.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xfindLast = /*#__PURE__*/__webpack_require__(/*! ./internal/_xfindLast */ 180);
+	var _xfindLast = /*#__PURE__*/__webpack_require__(/*! ./internal/_xfindLast */ 182);
 	
 	/**
 	 * Returns the last element of the list which matches the predicate, or
@@ -27242,15 +27353,15 @@ this["dash_composed"] =
 	module.exports = findLast;
 
 /***/ },
-/* 180 */
+/* 182 */
 /*!********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xfindLast.js ***!
   \********************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XFindLast = /*#__PURE__*/function () {
 	
@@ -27278,17 +27389,17 @@ this["dash_composed"] =
 	module.exports = _xfindLast;
 
 /***/ },
-/* 181 */
+/* 183 */
 /*!**************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/findLastIndex.js ***!
   \**************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xfindLastIndex = /*#__PURE__*/__webpack_require__(/*! ./internal/_xfindLastIndex */ 182);
+	var _xfindLastIndex = /*#__PURE__*/__webpack_require__(/*! ./internal/_xfindLastIndex */ 184);
 	
 	/**
 	 * Returns the index of the last element of the list which matches the
@@ -27327,15 +27438,15 @@ this["dash_composed"] =
 	module.exports = findLastIndex;
 
 /***/ },
-/* 182 */
+/* 184 */
 /*!*************************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xfindLastIndex.js ***!
   \*************************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XFindLastIndex = /*#__PURE__*/function () {
 	
@@ -27366,15 +27477,15 @@ this["dash_composed"] =
 	module.exports = _xfindLastIndex;
 
 /***/ },
-/* 183 */
+/* 185 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/flatten.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var _makeFlat = /*#__PURE__*/__webpack_require__(/*! ./internal/_makeFlat */ 90);
+	var _makeFlat = /*#__PURE__*/__webpack_require__(/*! ./internal/_makeFlat */ 92);
 	
 	/**
 	 * Returns a new list by pulling every item out of it (and all its sub-arrays)
@@ -27399,15 +27510,15 @@ this["dash_composed"] =
 	module.exports = flatten;
 
 /***/ },
-/* 184 */
+/* 186 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/flip.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
 	/**
 	 * Returns a new function much like the supplied one, except that the first two
@@ -27442,15 +27553,15 @@ this["dash_composed"] =
 	module.exports = flip;
 
 /***/ },
-/* 185 */
+/* 187 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/forEach.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _checkForMethod = /*#__PURE__*/__webpack_require__(/*! ./internal/_checkForMethod */ 106);
+	var _checkForMethod = /*#__PURE__*/__webpack_require__(/*! ./internal/_checkForMethod */ 108);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Iterate over an input `list`, calling a provided function `fn` for each
@@ -27500,15 +27611,15 @@ this["dash_composed"] =
 	module.exports = forEach;
 
 /***/ },
-/* 186 */
+/* 188 */
 /*!******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/forEachObjIndexed.js ***!
   \******************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 57);
+	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 59);
 	
 	/**
 	 * Iterate over an input `object`, calling a provided function `fn` for each
@@ -27547,13 +27658,13 @@ this["dash_composed"] =
 	module.exports = forEachObjIndexed;
 
 /***/ },
-/* 187 */
+/* 189 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/fromPairs.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Creates a new object from a list key-value pairs. If a key appears in
@@ -27585,17 +27696,17 @@ this["dash_composed"] =
 	module.exports = fromPairs;
 
 /***/ },
-/* 188 */
+/* 190 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/groupBy.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _checkForMethod = /*#__PURE__*/__webpack_require__(/*! ./internal/_checkForMethod */ 106);
+	var _checkForMethod = /*#__PURE__*/__webpack_require__(/*! ./internal/_checkForMethod */ 108);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var reduceBy = /*#__PURE__*/__webpack_require__(/*! ./reduceBy */ 138);
+	var reduceBy = /*#__PURE__*/__webpack_require__(/*! ./reduceBy */ 140);
 	
 	/**
 	 * Splits a list into sub-lists stored in an object, based on the result of
@@ -27649,13 +27760,13 @@ this["dash_composed"] =
 	module.exports = groupBy;
 
 /***/ },
-/* 189 */
+/* 191 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/groupWith.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Takes a list and returns a list of lists where each sublist's elements are
@@ -27706,13 +27817,13 @@ this["dash_composed"] =
 	module.exports = groupWith;
 
 /***/ },
-/* 190 */
+/* 192 */
 /*!***************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/gt.js ***!
   \***************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns `true` if the first argument is greater than the second; `false`
@@ -27743,13 +27854,13 @@ this["dash_composed"] =
 	module.exports = gt;
 
 /***/ },
-/* 191 */
+/* 193 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/gte.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns `true` if the first argument is greater than or equal to the second;
@@ -27780,15 +27891,15 @@ this["dash_composed"] =
 	module.exports = gte;
 
 /***/ },
-/* 192 */
+/* 194 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/has.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 60);
 	
 	/**
 	 * Returns whether or not an object has an own property with the specified name
@@ -27820,13 +27931,13 @@ this["dash_composed"] =
 	module.exports = has;
 
 /***/ },
-/* 193 */
+/* 195 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/hasIn.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns whether or not an object or its prototype chain has a property with
@@ -27862,13 +27973,13 @@ this["dash_composed"] =
 	module.exports = hasIn;
 
 /***/ },
-/* 194 */
+/* 196 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/head.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var nth = /*#__PURE__*/__webpack_require__(/*! ./nth */ 164);
+	var nth = /*#__PURE__*/__webpack_require__(/*! ./nth */ 166);
 	
 	/**
 	 * Returns the first element of the given list or string. In some libraries
@@ -27897,15 +28008,15 @@ this["dash_composed"] =
 	module.exports = head;
 
 /***/ },
-/* 195 */
+/* 197 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/identity.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var _identity = /*#__PURE__*/__webpack_require__(/*! ./internal/_identity */ 196);
+	var _identity = /*#__PURE__*/__webpack_require__(/*! ./internal/_identity */ 198);
 	
 	/**
 	 * A function that does nothing but return the parameter supplied to it. Good
@@ -27932,7 +28043,7 @@ this["dash_composed"] =
 	module.exports = identity;
 
 /***/ },
-/* 196 */
+/* 198 */
 /*!*******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_identity.js ***!
   \*******************************************************************************/
@@ -27944,15 +28055,15 @@ this["dash_composed"] =
 	module.exports = _identity;
 
 /***/ },
-/* 197 */
+/* 199 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/ifElse.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
 	/**
 	 * Creates a function that will process either the `onTrue` or the `onFalse`
@@ -27989,13 +28100,13 @@ this["dash_composed"] =
 	module.exports = ifElse;
 
 /***/ },
-/* 198 */
+/* 200 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/inc.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var add = /*#__PURE__*/__webpack_require__(/*! ./add */ 30);
+	var add = /*#__PURE__*/__webpack_require__(/*! ./add */ 32);
 	
 	/**
 	 * Increments its argument.
@@ -28018,13 +28129,13 @@ this["dash_composed"] =
 	module.exports = inc;
 
 /***/ },
-/* 199 */
+/* 201 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/indexBy.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var reduceBy = /*#__PURE__*/__webpack_require__(/*! ./reduceBy */ 138);
+	var reduceBy = /*#__PURE__*/__webpack_require__(/*! ./reduceBy */ 140);
 	
 	/**
 	 * Given a function that generates a key, turns a list of objects into an
@@ -28056,17 +28167,17 @@ this["dash_composed"] =
 	module.exports = indexBy;
 
 /***/ },
-/* 200 */
+/* 202 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/indexOf.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _indexOf = /*#__PURE__*/__webpack_require__(/*! ./internal/_indexOf */ 117);
+	var _indexOf = /*#__PURE__*/__webpack_require__(/*! ./internal/_indexOf */ 119);
 	
-	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArray */ 41);
+	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArray */ 43);
 	
 	/**
 	 * Returns the position of the first occurrence of an item in an array, or -1
@@ -28095,13 +28206,13 @@ this["dash_composed"] =
 	module.exports = indexOf;
 
 /***/ },
-/* 201 */
+/* 203 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/init.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 107);
+	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 109);
 	
 	/**
 	 * Returns all but the last element of the given list or string.
@@ -28133,17 +28244,17 @@ this["dash_composed"] =
 	module.exports = init;
 
 /***/ },
-/* 202 */
+/* 204 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/innerJoin.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _containsWith = /*#__PURE__*/__webpack_require__(/*! ./internal/_containsWith */ 121);
+	var _containsWith = /*#__PURE__*/__webpack_require__(/*! ./internal/_containsWith */ 123);
 	
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var _filter = /*#__PURE__*/__webpack_require__(/*! ./internal/_filter */ 129);
+	var _filter = /*#__PURE__*/__webpack_require__(/*! ./internal/_filter */ 131);
 	
 	/**
 	 * Takes a predicate `pred`, a list `xs`, and a list `ys`, and returns a list
@@ -28190,13 +28301,13 @@ this["dash_composed"] =
 	module.exports = innerJoin;
 
 /***/ },
-/* 203 */
+/* 205 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/insert.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Inserts the supplied element into the list, at the specified `index`. _Note that
@@ -28228,13 +28339,13 @@ this["dash_composed"] =
 	module.exports = insert;
 
 /***/ },
-/* 204 */
+/* 206 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/insertAll.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Inserts the sub-list into the list, at the specified `index`. _Note that this is not
@@ -28263,21 +28374,21 @@ this["dash_composed"] =
 	module.exports = insertAll;
 
 /***/ },
-/* 205 */
+/* 207 */
 /*!*************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/intersection.js ***!
   \*************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _contains = /*#__PURE__*/__webpack_require__(/*! ./internal/_contains */ 116);
+	var _contains = /*#__PURE__*/__webpack_require__(/*! ./internal/_contains */ 118);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _filter = /*#__PURE__*/__webpack_require__(/*! ./internal/_filter */ 129);
+	var _filter = /*#__PURE__*/__webpack_require__(/*! ./internal/_filter */ 131);
 	
-	var flip = /*#__PURE__*/__webpack_require__(/*! ./flip */ 184);
+	var flip = /*#__PURE__*/__webpack_require__(/*! ./flip */ 186);
 	
-	var uniq = /*#__PURE__*/__webpack_require__(/*! ./uniq */ 206);
+	var uniq = /*#__PURE__*/__webpack_require__(/*! ./uniq */ 208);
 	
 	/**
 	 * Combines two lists into a set (i.e. no duplicates) composed of those
@@ -28312,15 +28423,15 @@ this["dash_composed"] =
 	module.exports = intersection;
 
 /***/ },
-/* 206 */
+/* 208 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/uniq.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var identity = /*#__PURE__*/__webpack_require__(/*! ./identity */ 195);
+	var identity = /*#__PURE__*/__webpack_require__(/*! ./identity */ 197);
 	
-	var uniqBy = /*#__PURE__*/__webpack_require__(/*! ./uniqBy */ 207);
+	var uniqBy = /*#__PURE__*/__webpack_require__(/*! ./uniqBy */ 209);
 	
 	/**
 	 * Returns a new list containing only one copy of each element in the original
@@ -28345,15 +28456,15 @@ this["dash_composed"] =
 	module.exports = uniq;
 
 /***/ },
-/* 207 */
+/* 209 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/uniqBy.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _Set = /*#__PURE__*/__webpack_require__(/*! ./internal/_Set */ 208);
+	var _Set = /*#__PURE__*/__webpack_require__(/*! ./internal/_Set */ 210);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns a new list containing only one copy of each element in the original
@@ -28394,13 +28505,13 @@ this["dash_composed"] =
 	module.exports = uniqBy;
 
 /***/ },
-/* 208 */
+/* 210 */
 /*!**************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_Set.js ***!
   \**************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _contains = /*#__PURE__*/__webpack_require__(/*! ./_contains */ 116);
+	var _contains = /*#__PURE__*/__webpack_require__(/*! ./_contains */ 118);
 	
 	var _Set = /*#__PURE__*/function () {
 	
@@ -28576,15 +28687,15 @@ this["dash_composed"] =
 	module.exports = _Set;
 
 /***/ },
-/* 209 */
+/* 211 */
 /*!************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/intersperse.js ***!
   \************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _checkForMethod = /*#__PURE__*/__webpack_require__(/*! ./internal/_checkForMethod */ 106);
+	var _checkForMethod = /*#__PURE__*/__webpack_require__(/*! ./internal/_checkForMethod */ 108);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Creates a new list with the separator interposed between elements.
@@ -28622,21 +28733,21 @@ this["dash_composed"] =
 	module.exports = intersperse;
 
 /***/ },
-/* 210 */
+/* 212 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/into.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _clone = /*#__PURE__*/__webpack_require__(/*! ./internal/_clone */ 96);
+	var _clone = /*#__PURE__*/__webpack_require__(/*! ./internal/_clone */ 98);
 	
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var _isTransformer = /*#__PURE__*/__webpack_require__(/*! ./internal/_isTransformer */ 42);
+	var _isTransformer = /*#__PURE__*/__webpack_require__(/*! ./internal/_isTransformer */ 44);
 	
-	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 51);
+	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 53);
 	
-	var _stepCat = /*#__PURE__*/__webpack_require__(/*! ./internal/_stepCat */ 211);
+	var _stepCat = /*#__PURE__*/__webpack_require__(/*! ./internal/_stepCat */ 213);
 	
 	/**
 	 * Transforms the items of the list with the transducer and appends the
@@ -28684,21 +28795,21 @@ this["dash_composed"] =
 	module.exports = into;
 
 /***/ },
-/* 211 */
+/* 213 */
 /*!******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_stepCat.js ***!
   \******************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _assign = /*#__PURE__*/__webpack_require__(/*! ./_assign */ 212);
+	var _assign = /*#__PURE__*/__webpack_require__(/*! ./_assign */ 214);
 	
-	var _identity = /*#__PURE__*/__webpack_require__(/*! ./_identity */ 196);
+	var _identity = /*#__PURE__*/__webpack_require__(/*! ./_identity */ 198);
 	
-	var _isArrayLike = /*#__PURE__*/__webpack_require__(/*! ./_isArrayLike */ 52);
+	var _isArrayLike = /*#__PURE__*/__webpack_require__(/*! ./_isArrayLike */ 54);
 	
-	var _isTransformer = /*#__PURE__*/__webpack_require__(/*! ./_isTransformer */ 42);
+	var _isTransformer = /*#__PURE__*/__webpack_require__(/*! ./_isTransformer */ 44);
 	
-	var objOf = /*#__PURE__*/__webpack_require__(/*! ../objOf */ 214);
+	var objOf = /*#__PURE__*/__webpack_require__(/*! ../objOf */ 216);
 	
 	var _stepCatArray = {
 	  '@@transducer/init': Array,
@@ -28741,24 +28852,24 @@ this["dash_composed"] =
 	module.exports = _stepCat;
 
 /***/ },
-/* 212 */
+/* 214 */
 /*!*****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_assign.js ***!
   \*****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _objectAssign = /*#__PURE__*/__webpack_require__(/*! ./_objectAssign */ 213);
+	var _objectAssign = /*#__PURE__*/__webpack_require__(/*! ./_objectAssign */ 215);
 	
 	module.exports = typeof Object.assign === 'function' ? Object.assign : _objectAssign;
 
 /***/ },
-/* 213 */
+/* 215 */
 /*!***********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_objectAssign.js ***!
   \***********************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./_has */ 60);
 	
 	// Based on https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 	
@@ -28787,13 +28898,13 @@ this["dash_composed"] =
 	module.exports = _objectAssign;
 
 /***/ },
-/* 214 */
+/* 216 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/objOf.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Creates an object containing a single key:value pair.
@@ -28825,17 +28936,17 @@ this["dash_composed"] =
 	module.exports = objOf;
 
 /***/ },
-/* 215 */
+/* 217 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/invert.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 60);
 	
-	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 57);
+	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 59);
 	
 	/**
 	 * Same as [`R.invertObj`](#invertObj), however this accounts for objects with
@@ -28879,15 +28990,15 @@ this["dash_composed"] =
 	module.exports = invert;
 
 /***/ },
-/* 216 */
+/* 218 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/invertObj.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 57);
+	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 59);
 	
 	/**
 	 * Returns a new object with the keys of the given object as values, and the
@@ -28934,19 +29045,19 @@ this["dash_composed"] =
 	module.exports = invertObj;
 
 /***/ },
-/* 217 */
+/* 219 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/invoker.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _isFunction = /*#__PURE__*/__webpack_require__(/*! ./internal/_isFunction */ 84);
+	var _isFunction = /*#__PURE__*/__webpack_require__(/*! ./internal/_isFunction */ 86);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
-	var toString = /*#__PURE__*/__webpack_require__(/*! ./toString */ 114);
+	var toString = /*#__PURE__*/__webpack_require__(/*! ./toString */ 116);
 	
 	/**
 	 * Turns a named method with a specified arity into a function that can be
@@ -28989,13 +29100,13 @@ this["dash_composed"] =
 	module.exports = invoker;
 
 /***/ },
-/* 218 */
+/* 220 */
 /*!***************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/is.js ***!
   \***************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * See if an object (`val`) is an instance of the supplied constructor. This
@@ -29028,17 +29139,17 @@ this["dash_composed"] =
 	module.exports = is;
 
 /***/ },
-/* 219 */
+/* 221 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/isEmpty.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var empty = /*#__PURE__*/__webpack_require__(/*! ./empty */ 169);
+	var empty = /*#__PURE__*/__webpack_require__(/*! ./empty */ 171);
 	
-	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 118);
+	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 120);
 	
 	/**
 	 * Returns `true` if the given value is its type's empty value; `false`
@@ -29069,13 +29180,13 @@ this["dash_composed"] =
 	module.exports = isEmpty;
 
 /***/ },
-/* 220 */
+/* 222 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/join.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var invoker = /*#__PURE__*/__webpack_require__(/*! ./invoker */ 217);
+	var invoker = /*#__PURE__*/__webpack_require__(/*! ./invoker */ 219);
 	
 	/**
 	 * Returns a string made by inserting the `separator` between each element and
@@ -29102,15 +29213,15 @@ this["dash_composed"] =
 	module.exports = join;
 
 /***/ },
-/* 221 */
+/* 223 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/juxt.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var converge = /*#__PURE__*/__webpack_require__(/*! ./converge */ 136);
+	var converge = /*#__PURE__*/__webpack_require__(/*! ./converge */ 138);
 	
 	/**
 	 * juxt applies a list of functions to a list of values.
@@ -29139,13 +29250,13 @@ this["dash_composed"] =
 	module.exports = juxt;
 
 /***/ },
-/* 222 */
+/* 224 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/keysIn.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Returns a list containing the names of all the properties of the supplied
@@ -29181,17 +29292,17 @@ this["dash_composed"] =
 	module.exports = keysIn;
 
 /***/ },
-/* 223 */
+/* 225 */
 /*!************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/lastIndexOf.js ***!
   \************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArray */ 41);
+	var _isArray = /*#__PURE__*/__webpack_require__(/*! ./internal/_isArray */ 43);
 	
-	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 118);
+	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 120);
 	
 	/**
 	 * Returns the position of the last occurrence of an item in an array, or -1 if
@@ -29231,15 +29342,15 @@ this["dash_composed"] =
 	module.exports = lastIndexOf;
 
 /***/ },
-/* 224 */
+/* 226 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/length.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var _isNumber = /*#__PURE__*/__webpack_require__(/*! ./internal/_isNumber */ 225);
+	var _isNumber = /*#__PURE__*/__webpack_require__(/*! ./internal/_isNumber */ 227);
 	
 	/**
 	 * Returns the number of elements in the array by returning `list.length`.
@@ -29264,7 +29375,7 @@ this["dash_composed"] =
 	module.exports = length;
 
 /***/ },
-/* 225 */
+/* 227 */
 /*!*******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_isNumber.js ***!
   \*******************************************************************************/
@@ -29276,15 +29387,15 @@ this["dash_composed"] =
 	module.exports = _isNumber;
 
 /***/ },
-/* 226 */
+/* 228 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/lens.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 49);
+	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 51);
 	
 	/**
 	 * Returns a lens for the given getter and setter functions. The getter "gets"
@@ -29323,19 +29434,19 @@ this["dash_composed"] =
 	module.exports = lens;
 
 /***/ },
-/* 227 */
+/* 229 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/lensIndex.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var lens = /*#__PURE__*/__webpack_require__(/*! ./lens */ 226);
+	var lens = /*#__PURE__*/__webpack_require__(/*! ./lens */ 228);
 	
-	var nth = /*#__PURE__*/__webpack_require__(/*! ./nth */ 164);
+	var nth = /*#__PURE__*/__webpack_require__(/*! ./nth */ 166);
 	
-	var update = /*#__PURE__*/__webpack_require__(/*! ./update */ 148);
+	var update = /*#__PURE__*/__webpack_require__(/*! ./update */ 150);
 	
 	/**
 	 * Returns a lens whose focus is the specified index.
@@ -29365,19 +29476,19 @@ this["dash_composed"] =
 	module.exports = lensIndex;
 
 /***/ },
-/* 228 */
+/* 230 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/lensPath.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var assocPath = /*#__PURE__*/__webpack_require__(/*! ./assocPath */ 78);
+	var assocPath = /*#__PURE__*/__webpack_require__(/*! ./assocPath */ 80);
 	
-	var lens = /*#__PURE__*/__webpack_require__(/*! ./lens */ 226);
+	var lens = /*#__PURE__*/__webpack_require__(/*! ./lens */ 228);
 	
-	var path = /*#__PURE__*/__webpack_require__(/*! ./path */ 61);
+	var path = /*#__PURE__*/__webpack_require__(/*! ./path */ 63);
 	
 	/**
 	 * Returns a lens whose focus is the specified path.
@@ -29411,19 +29522,19 @@ this["dash_composed"] =
 	module.exports = lensPath;
 
 /***/ },
-/* 229 */
+/* 231 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/lensProp.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var assoc = /*#__PURE__*/__webpack_require__(/*! ./assoc */ 77);
+	var assoc = /*#__PURE__*/__webpack_require__(/*! ./assoc */ 79);
 	
-	var lens = /*#__PURE__*/__webpack_require__(/*! ./lens */ 226);
+	var lens = /*#__PURE__*/__webpack_require__(/*! ./lens */ 228);
 	
-	var prop = /*#__PURE__*/__webpack_require__(/*! ./prop */ 60);
+	var prop = /*#__PURE__*/__webpack_require__(/*! ./prop */ 62);
 	
 	/**
 	 * Returns a lens whose focus is the specified property.
@@ -29453,13 +29564,13 @@ this["dash_composed"] =
 	module.exports = lensProp;
 
 /***/ },
-/* 230 */
+/* 232 */
 /*!***************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/lt.js ***!
   \***************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns `true` if the first argument is less than the second; `false`
@@ -29490,13 +29601,13 @@ this["dash_composed"] =
 	module.exports = lt;
 
 /***/ },
-/* 231 */
+/* 233 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/lte.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns `true` if the first argument is less than or equal to the second;
@@ -29527,13 +29638,13 @@ this["dash_composed"] =
 	module.exports = lte;
 
 /***/ },
-/* 232 */
+/* 234 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/mapAccum.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * The `mapAccum` function behaves like a combination of map and reduce; it
@@ -29586,13 +29697,13 @@ this["dash_composed"] =
 	module.exports = mapAccum;
 
 /***/ },
-/* 233 */
+/* 235 */
 /*!**************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/mapAccumRight.js ***!
   \**************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * The `mapAccumRight` function behaves like a combination of map and reduce; it
@@ -29647,17 +29758,17 @@ this["dash_composed"] =
 	module.exports = mapAccumRight;
 
 /***/ },
-/* 234 */
+/* 236 */
 /*!**************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/mapObjIndexed.js ***!
   \**************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 51);
+	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 53);
 	
-	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 57);
+	var keys = /*#__PURE__*/__webpack_require__(/*! ./keys */ 59);
 	
 	/**
 	 * An Object-specific version of [`map`](#map). The function is applied to three
@@ -29691,13 +29802,13 @@ this["dash_composed"] =
 	module.exports = mapObjIndexed;
 
 /***/ },
-/* 235 */
+/* 237 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/match.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Tests a regular expression against a String. Note that this function will
@@ -29728,15 +29839,15 @@ this["dash_composed"] =
 	module.exports = match;
 
 /***/ },
-/* 236 */
+/* 238 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/mathMod.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _isInteger = /*#__PURE__*/__webpack_require__(/*! ./internal/_isInteger */ 79);
+	var _isInteger = /*#__PURE__*/__webpack_require__(/*! ./internal/_isInteger */ 81);
 	
 	/**
 	 * `mathMod` behaves like the modulo operator should mathematically, unlike the
@@ -29785,13 +29896,13 @@ this["dash_composed"] =
 	module.exports = mathMod;
 
 /***/ },
-/* 237 */
+/* 239 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/maxBy.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Takes a function and two values, and returns whichever value produces the
@@ -29825,15 +29936,15 @@ this["dash_composed"] =
 	module.exports = maxBy;
 
 /***/ },
-/* 238 */
+/* 240 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/mean.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var sum = /*#__PURE__*/__webpack_require__(/*! ./sum */ 239);
+	var sum = /*#__PURE__*/__webpack_require__(/*! ./sum */ 241);
 	
 	/**
 	 * Returns the mean of the given list of numbers.
@@ -29859,15 +29970,15 @@ this["dash_composed"] =
 	module.exports = mean;
 
 /***/ },
-/* 239 */
+/* 241 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/sum.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var add = /*#__PURE__*/__webpack_require__(/*! ./add */ 30);
+	var add = /*#__PURE__*/__webpack_require__(/*! ./add */ 32);
 	
-	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 62);
+	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 64);
 	
 	/**
 	 * Adds together all the elements of a list.
@@ -29890,15 +30001,15 @@ this["dash_composed"] =
 	module.exports = sum;
 
 /***/ },
-/* 240 */
+/* 242 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/median.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var mean = /*#__PURE__*/__webpack_require__(/*! ./mean */ 238);
+	var mean = /*#__PURE__*/__webpack_require__(/*! ./mean */ 240);
 	
 	/**
 	 * Returns the median of the given list of numbers.
@@ -29933,15 +30044,15 @@ this["dash_composed"] =
 	module.exports = median;
 
 /***/ },
-/* 241 */
+/* 243 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/memoize.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var memoizeWith = /*#__PURE__*/__webpack_require__(/*! ./memoizeWith */ 242);
+	var memoizeWith = /*#__PURE__*/__webpack_require__(/*! ./memoizeWith */ 244);
 	
-	var toString = /*#__PURE__*/__webpack_require__(/*! ./toString */ 114);
+	var toString = /*#__PURE__*/__webpack_require__(/*! ./toString */ 116);
 	
 	/**
 	 * Creates a new function that, when invoked, caches the result of calling `fn`
@@ -29979,17 +30090,17 @@ this["dash_composed"] =
 	module.exports = memoize;
 
 /***/ },
-/* 242 */
+/* 244 */
 /*!************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/memoizeWith.js ***!
   \************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 35);
+	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 37);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 60);
 	
 	/**
 	 * A customisable version of [`R.memoize`](#memoize). `memoizeWith` takes an
@@ -30035,15 +30146,15 @@ this["dash_composed"] =
 	module.exports = memoizeWith;
 
 /***/ },
-/* 243 */
+/* 245 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/merge.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _assign = /*#__PURE__*/__webpack_require__(/*! ./internal/_assign */ 212);
+	var _assign = /*#__PURE__*/__webpack_require__(/*! ./internal/_assign */ 214);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Create a new object with the own properties of the first object merged with
@@ -30076,15 +30187,15 @@ this["dash_composed"] =
 	module.exports = merge;
 
 /***/ },
-/* 244 */
+/* 246 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/mergeAll.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _assign = /*#__PURE__*/__webpack_require__(/*! ./internal/_assign */ 212);
+	var _assign = /*#__PURE__*/__webpack_require__(/*! ./internal/_assign */ 214);
 	
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Merges a list of objects together into one object.
@@ -30111,15 +30222,15 @@ this["dash_composed"] =
 	module.exports = mergeAll;
 
 /***/ },
-/* 245 */
+/* 247 */
 /*!**************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/mergeDeepLeft.js ***!
   \**************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var mergeDeepWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepWithKey */ 246);
+	var mergeDeepWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepWithKey */ 248);
 	
 	/**
 	 * Creates a new object with the own properties of the first object merged with
@@ -30152,17 +30263,17 @@ this["dash_composed"] =
 	module.exports = mergeDeepLeft;
 
 /***/ },
-/* 246 */
+/* 248 */
 /*!*****************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/mergeDeepWithKey.js ***!
   \*****************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var _isObject = /*#__PURE__*/__webpack_require__(/*! ./internal/_isObject */ 130);
+	var _isObject = /*#__PURE__*/__webpack_require__(/*! ./internal/_isObject */ 132);
 	
-	var mergeWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeWithKey */ 247);
+	var mergeWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeWithKey */ 249);
 	
 	/**
 	 * Creates a new object with the own properties of the two provided objects.
@@ -30206,15 +30317,15 @@ this["dash_composed"] =
 	module.exports = mergeDeepWithKey;
 
 /***/ },
-/* 247 */
+/* 249 */
 /*!*************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/mergeWithKey.js ***!
   \*************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 60);
 	
 	/**
 	 * Creates a new object with the own properties of the two provided objects. If
@@ -30264,15 +30375,15 @@ this["dash_composed"] =
 	module.exports = mergeWithKey;
 
 /***/ },
-/* 248 */
+/* 250 */
 /*!***************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/mergeDeepRight.js ***!
   \***************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var mergeDeepWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepWithKey */ 246);
+	var mergeDeepWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepWithKey */ 248);
 	
 	/**
 	 * Creates a new object with the own properties of the first object merged with
@@ -30305,15 +30416,15 @@ this["dash_composed"] =
 	module.exports = mergeDeepRight;
 
 /***/ },
-/* 249 */
+/* 251 */
 /*!**************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/mergeDeepWith.js ***!
   \**************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var mergeDeepWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepWithKey */ 246);
+	var mergeDeepWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeDeepWithKey */ 248);
 	
 	/**
 	 * Creates a new object with the own properties of the two provided objects.
@@ -30352,15 +30463,15 @@ this["dash_composed"] =
 	module.exports = mergeDeepWith;
 
 /***/ },
-/* 250 */
+/* 252 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/mergeWith.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var mergeWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeWithKey */ 247);
+	var mergeWithKey = /*#__PURE__*/__webpack_require__(/*! ./mergeWithKey */ 249);
 	
 	/**
 	 * Creates a new object with the own properties of the two provided objects. If
@@ -30395,13 +30506,13 @@ this["dash_composed"] =
 	module.exports = mergeWith;
 
 /***/ },
-/* 251 */
+/* 253 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/min.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns the smaller of its two arguments.
@@ -30428,13 +30539,13 @@ this["dash_composed"] =
 	module.exports = min;
 
 /***/ },
-/* 252 */
+/* 254 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/minBy.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Takes a function and two values, and returns whichever value produces the
@@ -30468,13 +30579,13 @@ this["dash_composed"] =
 	module.exports = minBy;
 
 /***/ },
-/* 253 */
+/* 255 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/modulo.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Divides the first parameter by the second and returns the remainder. Note
@@ -30509,13 +30620,13 @@ this["dash_composed"] =
 	module.exports = modulo;
 
 /***/ },
-/* 254 */
+/* 256 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/multiply.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Multiplies two numbers. Equivalent to `a * b` but curried.
@@ -30545,13 +30656,13 @@ this["dash_composed"] =
 	module.exports = multiply;
 
 /***/ },
-/* 255 */
+/* 257 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/negate.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Negates its argument.
@@ -30575,21 +30686,21 @@ this["dash_composed"] =
 	module.exports = negate;
 
 /***/ },
-/* 256 */
+/* 258 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/none.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _complement = /*#__PURE__*/__webpack_require__(/*! ./internal/_complement */ 127);
+	var _complement = /*#__PURE__*/__webpack_require__(/*! ./internal/_complement */ 129);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xany = /*#__PURE__*/__webpack_require__(/*! ./internal/_xany */ 65);
+	var _xany = /*#__PURE__*/__webpack_require__(/*! ./internal/_xany */ 67);
 	
-	var any = /*#__PURE__*/__webpack_require__(/*! ./any */ 64);
+	var any = /*#__PURE__*/__webpack_require__(/*! ./any */ 66);
 	
 	/**
 	 * Returns `true` if no elements of the list match the predicate, `false`
@@ -30620,17 +30731,17 @@ this["dash_composed"] =
 	module.exports = none;
 
 /***/ },
-/* 257 */
+/* 259 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/nthArg.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
-	var nth = /*#__PURE__*/__webpack_require__(/*! ./nth */ 164);
+	var nth = /*#__PURE__*/__webpack_require__(/*! ./nth */ 166);
 	
 	/**
 	 * Returns a function which returns its nth argument.
@@ -30661,13 +30772,13 @@ this["dash_composed"] =
 	module.exports = nthArg;
 
 /***/ },
-/* 258 */
+/* 260 */
 /*!**************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/o.js ***!
   \**************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * `o` is a curried composition function that returns a unary function.
@@ -30702,15 +30813,15 @@ this["dash_composed"] =
 	module.exports = o;
 
 /***/ },
-/* 259 */
+/* 261 */
 /*!***************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/of.js ***!
   \***************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var _of = /*#__PURE__*/__webpack_require__(/*! ./internal/_of */ 260);
+	var _of = /*#__PURE__*/__webpack_require__(/*! ./internal/_of */ 262);
 	
 	/**
 	 * Returns a singleton array containing the value provided.
@@ -30736,7 +30847,7 @@ this["dash_composed"] =
 	module.exports = of;
 
 /***/ },
-/* 260 */
+/* 262 */
 /*!*************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_of.js ***!
   \*************************************************************************/
@@ -30748,13 +30859,13 @@ this["dash_composed"] =
 	module.exports = _of;
 
 /***/ },
-/* 261 */
+/* 263 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/omit.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns a partial copy of an object omitting the keys specified.
@@ -30795,15 +30906,15 @@ this["dash_composed"] =
 	module.exports = omit;
 
 /***/ },
-/* 262 */
+/* 264 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/once.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 35);
+	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 37);
 	
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Accepts a function `fn` and returns a function that guards invocation of
@@ -30841,13 +30952,13 @@ this["dash_composed"] =
 	module.exports = once;
 
 /***/ },
-/* 263 */
+/* 265 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/over.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	// `Identity` is a functor that holds a single value, where `map` simply
 	// transforms the held value with the provided function.
@@ -30892,13 +31003,13 @@ this["dash_composed"] =
 	module.exports = over;
 
 /***/ },
-/* 264 */
+/* 266 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/pair.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Takes two arguments, `fst` and `snd`, and returns `[fst, snd]`.
@@ -30924,15 +31035,15 @@ this["dash_composed"] =
 	module.exports = pair;
 
 /***/ },
-/* 265 */
+/* 267 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/partial.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 33);
+	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 35);
 	
-	var _createPartialApplicator = /*#__PURE__*/__webpack_require__(/*! ./internal/_createPartialApplicator */ 266);
+	var _createPartialApplicator = /*#__PURE__*/__webpack_require__(/*! ./internal/_createPartialApplicator */ 268);
 	
 	/**
 	 * Takes a function `f` and a list of arguments, and returns a function `g`.
@@ -30968,15 +31079,15 @@ this["dash_composed"] =
 	module.exports = partial;
 
 /***/ },
-/* 266 */
+/* 268 */
 /*!**********************************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_createPartialApplicator.js ***!
   \**********************************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _arity = /*#__PURE__*/__webpack_require__(/*! ./_arity */ 35);
+	var _arity = /*#__PURE__*/__webpack_require__(/*! ./_arity */ 37);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
 	function _createPartialApplicator(concat) {
 	  return _curry2(function (fn, args) {
@@ -30988,17 +31099,17 @@ this["dash_composed"] =
 	module.exports = _createPartialApplicator;
 
 /***/ },
-/* 267 */
+/* 269 */
 /*!*************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/partialRight.js ***!
   \*************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 33);
+	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 35);
 	
-	var _createPartialApplicator = /*#__PURE__*/__webpack_require__(/*! ./internal/_createPartialApplicator */ 266);
+	var _createPartialApplicator = /*#__PURE__*/__webpack_require__(/*! ./internal/_createPartialApplicator */ 268);
 	
-	var flip = /*#__PURE__*/__webpack_require__(/*! ./flip */ 184);
+	var flip = /*#__PURE__*/__webpack_require__(/*! ./flip */ 186);
 	
 	/**
 	 * Takes a function `f` and a list of arguments, and returns a function `g`.
@@ -31030,17 +31141,17 @@ this["dash_composed"] =
 	module.exports = partialRight;
 
 /***/ },
-/* 268 */
+/* 270 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/partition.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var filter = /*#__PURE__*/__webpack_require__(/*! ./filter */ 128);
+	var filter = /*#__PURE__*/__webpack_require__(/*! ./filter */ 130);
 	
-	var juxt = /*#__PURE__*/__webpack_require__(/*! ./juxt */ 221);
+	var juxt = /*#__PURE__*/__webpack_require__(/*! ./juxt */ 223);
 	
-	var reject = /*#__PURE__*/__webpack_require__(/*! ./reject */ 126);
+	var reject = /*#__PURE__*/__webpack_require__(/*! ./reject */ 128);
 	
 	/**
 	 * Takes a predicate and a list or other `Filterable` object and returns the
@@ -31072,17 +31183,17 @@ this["dash_composed"] =
 	module.exports = partition;
 
 /***/ },
-/* 269 */
+/* 271 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/pathEq.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 118);
+	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 120);
 	
-	var path = /*#__PURE__*/__webpack_require__(/*! ./path */ 61);
+	var path = /*#__PURE__*/__webpack_require__(/*! ./path */ 63);
 	
 	/**
 	 * Determines whether a nested path on an object has a specific value, in
@@ -31116,17 +31227,17 @@ this["dash_composed"] =
 	module.exports = pathEq;
 
 /***/ },
-/* 270 */
+/* 272 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/pathOr.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var defaultTo = /*#__PURE__*/__webpack_require__(/*! ./defaultTo */ 141);
+	var defaultTo = /*#__PURE__*/__webpack_require__(/*! ./defaultTo */ 143);
 	
-	var path = /*#__PURE__*/__webpack_require__(/*! ./path */ 61);
+	var path = /*#__PURE__*/__webpack_require__(/*! ./path */ 63);
 	
 	/**
 	 * If the given, non-null object has a value at the given path, returns the
@@ -31155,15 +31266,15 @@ this["dash_composed"] =
 	module.exports = pathOr;
 
 /***/ },
-/* 271 */
+/* 273 */
 /*!**************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/pathSatisfies.js ***!
   \**************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var path = /*#__PURE__*/__webpack_require__(/*! ./path */ 61);
+	var path = /*#__PURE__*/__webpack_require__(/*! ./path */ 63);
 	
 	/**
 	 * Returns `true` if the specified object property at given path satisfies the
@@ -31192,13 +31303,13 @@ this["dash_composed"] =
 	module.exports = pathSatisfies;
 
 /***/ },
-/* 272 */
+/* 274 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/pick.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns a partial copy of an object containing only the keys specified. If
@@ -31234,13 +31345,13 @@ this["dash_composed"] =
 	module.exports = pick;
 
 /***/ },
-/* 273 */
+/* 275 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/pickAll.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Similar to `pick` except that this one includes a `key: undefined` pair for
@@ -31276,13 +31387,13 @@ this["dash_composed"] =
 	module.exports = pickAll;
 
 /***/ },
-/* 274 */
+/* 276 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/pickBy.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns a partial copy of an object containing only the keys that satisfy
@@ -31318,15 +31429,15 @@ this["dash_composed"] =
 	module.exports = pickBy;
 
 /***/ },
-/* 275 */
+/* 277 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/pipeK.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var composeK = /*#__PURE__*/__webpack_require__(/*! ./composeK */ 109);
+	var composeK = /*#__PURE__*/__webpack_require__(/*! ./composeK */ 111);
 	
-	var reverse = /*#__PURE__*/__webpack_require__(/*! ./reverse */ 108);
+	var reverse = /*#__PURE__*/__webpack_require__(/*! ./reverse */ 110);
 	
 	/**
 	 * Returns the left-to-right Kleisli composition of the provided functions,
@@ -31373,15 +31484,15 @@ this["dash_composed"] =
 	module.exports = pipeK;
 
 /***/ },
-/* 276 */
+/* 278 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/prepend.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 33);
+	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 35);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns a new list with the given element at the front, followed by the
@@ -31408,15 +31519,15 @@ this["dash_composed"] =
 	module.exports = prepend;
 
 /***/ },
-/* 277 */
+/* 279 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/product.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var multiply = /*#__PURE__*/__webpack_require__(/*! ./multiply */ 254);
+	var multiply = /*#__PURE__*/__webpack_require__(/*! ./multiply */ 256);
 	
-	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 62);
+	var reduce = /*#__PURE__*/__webpack_require__(/*! ./reduce */ 64);
 	
 	/**
 	 * Multiplies together all the elements of a list.
@@ -31439,19 +31550,19 @@ this["dash_composed"] =
 	module.exports = product;
 
 /***/ },
-/* 278 */
+/* 280 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/project.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _map = /*#__PURE__*/__webpack_require__(/*! ./internal/_map */ 50);
+	var _map = /*#__PURE__*/__webpack_require__(/*! ./internal/_map */ 52);
 	
-	var identity = /*#__PURE__*/__webpack_require__(/*! ./identity */ 195);
+	var identity = /*#__PURE__*/__webpack_require__(/*! ./identity */ 197);
 	
-	var pickAll = /*#__PURE__*/__webpack_require__(/*! ./pickAll */ 273);
+	var pickAll = /*#__PURE__*/__webpack_require__(/*! ./pickAll */ 275);
 	
-	var useWith = /*#__PURE__*/__webpack_require__(/*! ./useWith */ 279);
+	var useWith = /*#__PURE__*/__webpack_require__(/*! ./useWith */ 281);
 	
 	/**
 	 * Reasonable analog to SQL `select` statement.
@@ -31478,15 +31589,15 @@ this["dash_composed"] =
 	module.exports = project;
 
 /***/ },
-/* 279 */
+/* 281 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/useWith.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
 	/**
 	 * Accepts a function `fn` and a list of transformer functions and returns a
@@ -31533,15 +31644,15 @@ this["dash_composed"] =
 	module.exports = useWith;
 
 /***/ },
-/* 280 */
+/* 282 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/propEq.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 118);
+	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 120);
 	
 	/**
 	 * Returns `true` if the specified object property is equal, in
@@ -31576,15 +31687,15 @@ this["dash_composed"] =
 	module.exports = propEq;
 
 /***/ },
-/* 281 */
+/* 283 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/propIs.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var is = /*#__PURE__*/__webpack_require__(/*! ./is */ 218);
+	var is = /*#__PURE__*/__webpack_require__(/*! ./is */ 220);
 	
 	/**
 	 * Returns `true` if the specified object property is of the given type;
@@ -31614,15 +31725,15 @@ this["dash_composed"] =
 	module.exports = propIs;
 
 /***/ },
-/* 282 */
+/* 284 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/propOr.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 60);
 	
 	/**
 	 * If the given, non-null object has an own property with the specified name,
@@ -31658,13 +31769,13 @@ this["dash_composed"] =
 	module.exports = propOr;
 
 /***/ },
-/* 283 */
+/* 285 */
 /*!**************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/propSatisfies.js ***!
   \**************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Returns `true` if the specified object property satisfies the given
@@ -31693,13 +31804,13 @@ this["dash_composed"] =
 	module.exports = propSatisfies;
 
 /***/ },
-/* 284 */
+/* 286 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/props.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Acts as multiple `prop`: array of keys in, array of values out. Preserves
@@ -31738,15 +31849,15 @@ this["dash_composed"] =
 	module.exports = props;
 
 /***/ },
-/* 285 */
+/* 287 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/range.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _isNumber = /*#__PURE__*/__webpack_require__(/*! ./internal/_isNumber */ 225);
+	var _isNumber = /*#__PURE__*/__webpack_require__(/*! ./internal/_isNumber */ 227);
 	
 	/**
 	 * Returns a list of numbers from `from` (inclusive) to `to` (exclusive).
@@ -31781,13 +31892,13 @@ this["dash_composed"] =
 	module.exports = range;
 
 /***/ },
-/* 286 */
+/* 288 */
 /*!************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/reduceRight.js ***!
   \************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Returns a single item by iterating through the list, successively calling
@@ -31844,17 +31955,17 @@ this["dash_composed"] =
 	module.exports = reduceRight;
 
 /***/ },
-/* 287 */
+/* 289 */
 /*!************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/reduceWhile.js ***!
   \************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curryN = /*#__PURE__*/__webpack_require__(/*! ./internal/_curryN */ 36);
+	var _curryN = /*#__PURE__*/__webpack_require__(/*! ./internal/_curryN */ 38);
 	
-	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 51);
+	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 53);
 	
-	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduced */ 44);
+	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduced */ 46);
 	
 	/**
 	 * Like [`reduce`](#reduce), `reduceWhile` returns a single item by iterating
@@ -31895,15 +32006,15 @@ this["dash_composed"] =
 	module.exports = reduceWhile;
 
 /***/ },
-/* 288 */
+/* 290 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/reduced.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduced */ 44);
+	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduced */ 46);
 	
 	/**
 	 * Returns a value wrapped to indicate that it is the final value of the reduce
@@ -31935,17 +32046,17 @@ this["dash_composed"] =
 	module.exports = reduced;
 
 /***/ },
-/* 289 */
+/* 291 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/repeat.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var always = /*#__PURE__*/__webpack_require__(/*! ./always */ 25);
+	var always = /*#__PURE__*/__webpack_require__(/*! ./always */ 27);
 	
-	var times = /*#__PURE__*/__webpack_require__(/*! ./times */ 290);
+	var times = /*#__PURE__*/__webpack_require__(/*! ./times */ 292);
 	
 	/**
 	 * Returns a fixed list of size `n` containing a specified identical value.
@@ -31978,13 +32089,13 @@ this["dash_composed"] =
 	module.exports = repeat;
 
 /***/ },
-/* 290 */
+/* 292 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/times.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Calls an input function `n` times, returning an array containing the results
@@ -32029,13 +32140,13 @@ this["dash_composed"] =
 	module.exports = times;
 
 /***/ },
-/* 291 */
+/* 293 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/replace.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Replace a substring or regex match in a string with a replacement.
@@ -32065,13 +32176,13 @@ this["dash_composed"] =
 	module.exports = replace;
 
 /***/ },
-/* 292 */
+/* 294 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/scan.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Scan is similar to [`reduce`](#reduce), but returns a list of successively
@@ -32110,21 +32221,21 @@ this["dash_composed"] =
 	module.exports = scan;
 
 /***/ },
-/* 293 */
+/* 295 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/sequence.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var ap = /*#__PURE__*/__webpack_require__(/*! ./ap */ 67);
+	var ap = /*#__PURE__*/__webpack_require__(/*! ./ap */ 69);
 	
-	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 49);
+	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 51);
 	
-	var prepend = /*#__PURE__*/__webpack_require__(/*! ./prepend */ 276);
+	var prepend = /*#__PURE__*/__webpack_require__(/*! ./prepend */ 278);
 	
-	var reduceRight = /*#__PURE__*/__webpack_require__(/*! ./reduceRight */ 286);
+	var reduceRight = /*#__PURE__*/__webpack_require__(/*! ./reduceRight */ 288);
 	
 	/**
 	 * Transforms a [Traversable](https://github.com/fantasyland/fantasy-land#traversable)
@@ -32160,17 +32271,17 @@ this["dash_composed"] =
 	module.exports = sequence;
 
 /***/ },
-/* 294 */
+/* 296 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/set.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var always = /*#__PURE__*/__webpack_require__(/*! ./always */ 25);
+	var always = /*#__PURE__*/__webpack_require__(/*! ./always */ 27);
 	
-	var over = /*#__PURE__*/__webpack_require__(/*! ./over */ 263);
+	var over = /*#__PURE__*/__webpack_require__(/*! ./over */ 265);
 	
 	/**
 	 * Returns the result of "setting" the portion of the given data structure
@@ -32202,13 +32313,13 @@ this["dash_composed"] =
 	module.exports = set;
 
 /***/ },
-/* 295 */
+/* 297 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/sort.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns a copy of the list, sorted according to the comparator function,
@@ -32238,13 +32349,13 @@ this["dash_composed"] =
 	module.exports = sort;
 
 /***/ },
-/* 296 */
+/* 298 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/sortBy.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Sorts the list according to the supplied function.
@@ -32290,13 +32401,13 @@ this["dash_composed"] =
 	module.exports = sortBy;
 
 /***/ },
-/* 297 */
+/* 299 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/sortWith.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Sorts a list according to a list of comparators.
@@ -32346,13 +32457,13 @@ this["dash_composed"] =
 	module.exports = sortWith;
 
 /***/ },
-/* 298 */
+/* 300 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/split.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var invoker = /*#__PURE__*/__webpack_require__(/*! ./invoker */ 217);
+	var invoker = /*#__PURE__*/__webpack_require__(/*! ./invoker */ 219);
 	
 	/**
 	 * Splits a string into an array of strings based on the given
@@ -32380,17 +32491,17 @@ this["dash_composed"] =
 	module.exports = split;
 
 /***/ },
-/* 299 */
+/* 301 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/splitAt.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var length = /*#__PURE__*/__webpack_require__(/*! ./length */ 224);
+	var length = /*#__PURE__*/__webpack_require__(/*! ./length */ 226);
 	
-	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 107);
+	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 109);
 	
 	/**
 	 * Splits a given list or string at a given index.
@@ -32418,15 +32529,15 @@ this["dash_composed"] =
 	module.exports = splitAt;
 
 /***/ },
-/* 300 */
+/* 302 */
 /*!***********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/splitEvery.js ***!
   \***********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 107);
+	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 109);
 	
 	/**
 	 * Splits a collection into slices of the specified length.
@@ -32461,13 +32572,13 @@ this["dash_composed"] =
 	module.exports = splitEvery;
 
 /***/ },
-/* 301 */
+/* 303 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/splitWhen.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Takes a list and a predicate and returns a pair of lists with the following properties:
@@ -32505,17 +32616,17 @@ this["dash_composed"] =
 	module.exports = splitWhen;
 
 /***/ },
-/* 302 */
+/* 304 */
 /*!***********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/startsWith.js ***!
   \***********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 118);
+	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 120);
 	
-	var take = /*#__PURE__*/__webpack_require__(/*! ./take */ 154);
+	var take = /*#__PURE__*/__webpack_require__(/*! ./take */ 156);
 	
 	/**
 	 * Checks if a list starts with the provided values
@@ -32544,13 +32655,13 @@ this["dash_composed"] =
 	module.exports = startsWith;
 
 /***/ },
-/* 303 */
+/* 305 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/subtract.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Subtracts its second argument from its first argument.
@@ -32583,17 +32694,17 @@ this["dash_composed"] =
 	module.exports = subtract;
 
 /***/ },
-/* 304 */
+/* 306 */
 /*!********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/symmetricDifference.js ***!
   \********************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var concat = /*#__PURE__*/__webpack_require__(/*! ./concat */ 113);
+	var concat = /*#__PURE__*/__webpack_require__(/*! ./concat */ 115);
 	
-	var difference = /*#__PURE__*/__webpack_require__(/*! ./difference */ 143);
+	var difference = /*#__PURE__*/__webpack_require__(/*! ./difference */ 145);
 	
 	/**
 	 * Finds the set (i.e. no duplicates) of all elements contained in the first or
@@ -32621,17 +32732,17 @@ this["dash_composed"] =
 	module.exports = symmetricDifference;
 
 /***/ },
-/* 305 */
+/* 307 */
 /*!************************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/symmetricDifferenceWith.js ***!
   \************************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var concat = /*#__PURE__*/__webpack_require__(/*! ./concat */ 113);
+	var concat = /*#__PURE__*/__webpack_require__(/*! ./concat */ 115);
 	
-	var differenceWith = /*#__PURE__*/__webpack_require__(/*! ./differenceWith */ 144);
+	var differenceWith = /*#__PURE__*/__webpack_require__(/*! ./differenceWith */ 146);
 	
 	/**
 	 * Finds the set (i.e. no duplicates) of all elements contained in the first or
@@ -32663,15 +32774,15 @@ this["dash_composed"] =
 	module.exports = symmetricDifferenceWith;
 
 /***/ },
-/* 306 */
+/* 308 */
 /*!**************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/takeLastWhile.js ***!
   \**************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 107);
+	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 109);
 	
 	/**
 	 * Returns a new list containing the last `n` elements of a given list, passing
@@ -32710,19 +32821,19 @@ this["dash_composed"] =
 	module.exports = takeLastWhile;
 
 /***/ },
-/* 307 */
+/* 309 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/takeWhile.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xtakeWhile = /*#__PURE__*/__webpack_require__(/*! ./internal/_xtakeWhile */ 308);
+	var _xtakeWhile = /*#__PURE__*/__webpack_require__(/*! ./internal/_xtakeWhile */ 310);
 	
-	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 107);
+	var slice = /*#__PURE__*/__webpack_require__(/*! ./slice */ 109);
 	
 	/**
 	 * Returns a new list containing the first `n` elements of a given list,
@@ -32766,17 +32877,17 @@ this["dash_composed"] =
 	module.exports = takeWhile;
 
 /***/ },
-/* 308 */
+/* 310 */
 /*!*********************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xtakeWhile.js ***!
   \*********************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./_reduced */ 44);
+	var _reduced = /*#__PURE__*/__webpack_require__(/*! ./_reduced */ 46);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XTakeWhile = /*#__PURE__*/function () {
 	
@@ -32799,17 +32910,17 @@ this["dash_composed"] =
 	module.exports = _xtakeWhile;
 
 /***/ },
-/* 309 */
+/* 311 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/tap.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 40);
+	var _dispatchable = /*#__PURE__*/__webpack_require__(/*! ./internal/_dispatchable */ 42);
 	
-	var _xtap = /*#__PURE__*/__webpack_require__(/*! ./internal/_xtap */ 310);
+	var _xtap = /*#__PURE__*/__webpack_require__(/*! ./internal/_xtap */ 312);
 	
 	/**
 	 * Runs the given function with the supplied object, then returns the object.
@@ -32840,15 +32951,15 @@ this["dash_composed"] =
 	module.exports = tap;
 
 /***/ },
-/* 310 */
+/* 312 */
 /*!***************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_xtap.js ***!
   \***************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./_curry2 */ 33);
 	
-	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 45);
+	var _xfBase = /*#__PURE__*/__webpack_require__(/*! ./_xfBase */ 47);
 	
 	var XTap = /*#__PURE__*/function () {
 	
@@ -32872,19 +32983,19 @@ this["dash_composed"] =
 	module.exports = _xtap;
 
 /***/ },
-/* 311 */
+/* 313 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/test.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _cloneRegExp = /*#__PURE__*/__webpack_require__(/*! ./internal/_cloneRegExp */ 97);
+	var _cloneRegExp = /*#__PURE__*/__webpack_require__(/*! ./internal/_cloneRegExp */ 99);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _isRegExp = /*#__PURE__*/__webpack_require__(/*! ./internal/_isRegExp */ 312);
+	var _isRegExp = /*#__PURE__*/__webpack_require__(/*! ./internal/_isRegExp */ 314);
 	
-	var toString = /*#__PURE__*/__webpack_require__(/*! ./toString */ 114);
+	var toString = /*#__PURE__*/__webpack_require__(/*! ./toString */ 116);
 	
 	/**
 	 * Determines whether a given string matches a given regular expression.
@@ -32914,7 +33025,7 @@ this["dash_composed"] =
 	module.exports = test;
 
 /***/ },
-/* 312 */
+/* 314 */
 /*!*******************************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/internal/_isRegExp.js ***!
   \*******************************************************************************/
@@ -32926,13 +33037,13 @@ this["dash_composed"] =
 	module.exports = _isRegExp;
 
 /***/ },
-/* 313 */
+/* 315 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/toLower.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var invoker = /*#__PURE__*/__webpack_require__(/*! ./invoker */ 217);
+	var invoker = /*#__PURE__*/__webpack_require__(/*! ./invoker */ 219);
 	
 	/**
 	 * The lower case version of a string.
@@ -32955,15 +33066,15 @@ this["dash_composed"] =
 	module.exports = toLower;
 
 /***/ },
-/* 314 */
+/* 316 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/toPairs.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 60);
 	
 	/**
 	 * Converts an object into an array of key, value arrays. Only the object's
@@ -32997,13 +33108,13 @@ this["dash_composed"] =
 	module.exports = toPairs;
 
 /***/ },
-/* 315 */
+/* 317 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/toPairsIn.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Converts an object into an array of key, value arrays. The object's own
@@ -33038,13 +33149,13 @@ this["dash_composed"] =
 	module.exports = toPairsIn;
 
 /***/ },
-/* 316 */
+/* 318 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/toUpper.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var invoker = /*#__PURE__*/__webpack_require__(/*! ./invoker */ 217);
+	var invoker = /*#__PURE__*/__webpack_require__(/*! ./invoker */ 219);
 	
 	/**
 	 * The upper case version of a string.
@@ -33067,17 +33178,17 @@ this["dash_composed"] =
 	module.exports = toUpper;
 
 /***/ },
-/* 317 */
+/* 319 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/transduce.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 51);
+	var _reduce = /*#__PURE__*/__webpack_require__(/*! ./internal/_reduce */ 53);
 	
-	var _xwrap = /*#__PURE__*/__webpack_require__(/*! ./internal/_xwrap */ 54);
+	var _xwrap = /*#__PURE__*/__webpack_require__(/*! ./internal/_xwrap */ 56);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
 	/**
 	 * Initializes a transducer using supplied iterator function. Returns a single
@@ -33134,13 +33245,13 @@ this["dash_composed"] =
 	module.exports = transduce;
 
 /***/ },
-/* 318 */
+/* 320 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/transpose.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Transposes the rows and columns of a 2D list.
@@ -33188,17 +33299,17 @@ this["dash_composed"] =
 	module.exports = transpose;
 
 /***/ },
-/* 319 */
+/* 321 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/traverse.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 49);
+	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 51);
 	
-	var sequence = /*#__PURE__*/__webpack_require__(/*! ./sequence */ 293);
+	var sequence = /*#__PURE__*/__webpack_require__(/*! ./sequence */ 295);
 	
 	/**
 	 * Maps an [Applicative](https://github.com/fantasyland/fantasy-land#applicative)-returning
@@ -33234,13 +33345,13 @@ this["dash_composed"] =
 	module.exports = traverse;
 
 /***/ },
-/* 320 */
+/* 322 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/trim.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	var ws = '\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003' + '\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028' + '\u2029\uFEFF';
 	var zeroWidth = '\u200b';
@@ -33271,17 +33382,17 @@ this["dash_composed"] =
 	module.exports = trim;
 
 /***/ },
-/* 321 */
+/* 323 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/tryCatch.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 35);
+	var _arity = /*#__PURE__*/__webpack_require__(/*! ./internal/_arity */ 37);
 	
-	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 33);
+	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 35);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * `tryCatch` takes two functions, a `tryer` and a `catcher`. The returned
@@ -33318,13 +33429,13 @@ this["dash_composed"] =
 	module.exports = tryCatch;
 
 /***/ },
-/* 322 */
+/* 324 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/unapply.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Takes a function `fn`, which takes a single array argument, and returns a
@@ -33360,15 +33471,15 @@ this["dash_composed"] =
 	module.exports = unapply;
 
 /***/ },
-/* 323 */
+/* 325 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/unary.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
-	var nAry = /*#__PURE__*/__webpack_require__(/*! ./nAry */ 82);
+	var nAry = /*#__PURE__*/__webpack_require__(/*! ./nAry */ 84);
 	
 	/**
 	 * Wraps a function of any arity (including nullary) in a function that accepts
@@ -33406,15 +33517,15 @@ this["dash_composed"] =
 	module.exports = unary;
 
 /***/ },
-/* 324 */
+/* 326 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/uncurryN.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 34);
+	var curryN = /*#__PURE__*/__webpack_require__(/*! ./curryN */ 36);
 	
 	/**
 	 * Returns a function of arity `n` from a (manually) curried function.
@@ -33455,13 +33566,13 @@ this["dash_composed"] =
 	module.exports = uncurryN;
 
 /***/ },
-/* 325 */
+/* 327 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/unfold.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Builds a list from a seed value. Accepts an iterator function, which returns
@@ -33502,19 +33613,19 @@ this["dash_composed"] =
 	module.exports = unfold;
 
 /***/ },
-/* 326 */
+/* 328 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/union.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 33);
+	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 35);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var compose = /*#__PURE__*/__webpack_require__(/*! ./compose */ 102);
+	var compose = /*#__PURE__*/__webpack_require__(/*! ./compose */ 104);
 	
-	var uniq = /*#__PURE__*/__webpack_require__(/*! ./uniq */ 206);
+	var uniq = /*#__PURE__*/__webpack_require__(/*! ./uniq */ 208);
 	
 	/**
 	 * Combines two lists into a set (i.e. no duplicates) composed of the elements
@@ -33539,17 +33650,17 @@ this["dash_composed"] =
 	module.exports = union;
 
 /***/ },
-/* 327 */
+/* 329 */
 /*!**********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/unionWith.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 33);
+	var _concat = /*#__PURE__*/__webpack_require__(/*! ./internal/_concat */ 35);
 	
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
-	var uniqWith = /*#__PURE__*/__webpack_require__(/*! ./uniqWith */ 328);
+	var uniqWith = /*#__PURE__*/__webpack_require__(/*! ./uniqWith */ 330);
 	
 	/**
 	 * Combines two lists into a set (i.e. no duplicates) composed of the elements
@@ -33581,15 +33692,15 @@ this["dash_composed"] =
 	module.exports = unionWith;
 
 /***/ },
-/* 328 */
+/* 330 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/uniqWith.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _containsWith = /*#__PURE__*/__webpack_require__(/*! ./internal/_containsWith */ 121);
+	var _containsWith = /*#__PURE__*/__webpack_require__(/*! ./internal/_containsWith */ 123);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Returns a new list containing only one copy of each element in the original
@@ -33632,13 +33743,13 @@ this["dash_composed"] =
 	module.exports = uniqWith;
 
 /***/ },
-/* 329 */
+/* 331 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/unless.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Tests the final argument by passing it to the given predicate function. If
@@ -33672,15 +33783,15 @@ this["dash_composed"] =
 	module.exports = unless;
 
 /***/ },
-/* 330 */
+/* 332 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/unnest.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _identity = /*#__PURE__*/__webpack_require__(/*! ./internal/_identity */ 196);
+	var _identity = /*#__PURE__*/__webpack_require__(/*! ./internal/_identity */ 198);
 	
-	var chain = /*#__PURE__*/__webpack_require__(/*! ./chain */ 89);
+	var chain = /*#__PURE__*/__webpack_require__(/*! ./chain */ 91);
 	
 	/**
 	 * Shorthand for `R.chain(R.identity)`, which removes one level of nesting from
@@ -33705,13 +33816,13 @@ this["dash_composed"] =
 	module.exports = unnest;
 
 /***/ },
-/* 331 */
+/* 333 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/until.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Takes a predicate, a transformation function, and an initial value,
@@ -33744,13 +33855,13 @@ this["dash_composed"] =
 	module.exports = until;
 
 /***/ },
-/* 332 */
+/* 334 */
 /*!*********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/valuesIn.js ***!
   \*********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 26);
+	var _curry1 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry1 */ 28);
 	
 	/**
 	 * Returns a list of all the properties, including prototype properties, of the
@@ -33786,13 +33897,13 @@ this["dash_composed"] =
 	module.exports = valuesIn;
 
 /***/ },
-/* 333 */
+/* 335 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/view.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	// `Const` is a functor that effectively ignores the function given to `map`.
 	
@@ -33832,13 +33943,13 @@ this["dash_composed"] =
 	module.exports = view;
 
 /***/ },
-/* 334 */
+/* 336 */
 /*!*****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/when.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Tests the final argument by passing it to the given predicate function. If
@@ -33876,15 +33987,15 @@ this["dash_composed"] =
 	module.exports = when;
 
 /***/ },
-/* 335 */
+/* 337 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/where.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 58);
+	var _has = /*#__PURE__*/__webpack_require__(/*! ./internal/_has */ 60);
 	
 	/**
 	 * Takes a spec object and a test object; returns true if the test satisfies
@@ -33934,19 +34045,19 @@ this["dash_composed"] =
 	module.exports = where;
 
 /***/ },
-/* 336 */
+/* 338 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/whereEq.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 118);
+	var equals = /*#__PURE__*/__webpack_require__(/*! ./equals */ 120);
 	
-	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 49);
+	var map = /*#__PURE__*/__webpack_require__(/*! ./map */ 51);
 	
-	var where = /*#__PURE__*/__webpack_require__(/*! ./where */ 335);
+	var where = /*#__PURE__*/__webpack_require__(/*! ./where */ 337);
 	
 	/**
 	 * Takes a spec object and a test object; returns true if the test satisfies
@@ -33984,19 +34095,19 @@ this["dash_composed"] =
 	module.exports = whereEq;
 
 /***/ },
-/* 337 */
+/* 339 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/without.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _contains = /*#__PURE__*/__webpack_require__(/*! ./internal/_contains */ 116);
+	var _contains = /*#__PURE__*/__webpack_require__(/*! ./internal/_contains */ 118);
 	
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
-	var flip = /*#__PURE__*/__webpack_require__(/*! ./flip */ 184);
+	var flip = /*#__PURE__*/__webpack_require__(/*! ./flip */ 186);
 	
-	var reject = /*#__PURE__*/__webpack_require__(/*! ./reject */ 126);
+	var reject = /*#__PURE__*/__webpack_require__(/*! ./reject */ 128);
 	
 	/**
 	 * Returns a new list without values in the first argument.
@@ -34025,13 +34136,13 @@ this["dash_composed"] =
 	module.exports = without;
 
 /***/ },
-/* 338 */
+/* 340 */
 /*!******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/xprod.js ***!
   \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Creates a new list out of the two supplied by creating each possible pair
@@ -34073,13 +34184,13 @@ this["dash_composed"] =
 	module.exports = xprod;
 
 /***/ },
-/* 339 */
+/* 341 */
 /*!****************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/zip.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Creates a new list out of the two supplied by pairing up equally-positioned
@@ -34115,13 +34226,13 @@ this["dash_composed"] =
 	module.exports = zip;
 
 /***/ },
-/* 340 */
+/* 342 */
 /*!*******************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/zipObj.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 31);
+	var _curry2 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry2 */ 33);
 	
 	/**
 	 * Creates a new object out of a list of keys and a list of values.
@@ -34155,13 +34266,13 @@ this["dash_composed"] =
 	module.exports = zipObj;
 
 /***/ },
-/* 341 */
+/* 343 */
 /*!********************************************************************!*\
   !*** ../~/.registry.npmjs.org/ramda/0.25.0/~/ramda/src/zipWith.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 38);
+	var _curry3 = /*#__PURE__*/__webpack_require__(/*! ./internal/_curry3 */ 40);
 	
 	/**
 	 * Creates a new list out of the two supplied by applying the function to each
@@ -34202,10 +34313,10 @@ this["dash_composed"] =
 	module.exports = zipWith;
 
 /***/ },
-/* 342 */
-/*!************************************!*\
-  !*** ./transpile/errorBoundary.js ***!
-  \************************************/
+/* 344 */
+/*!***************************************!*\
+  !*** ../~/react-plotly.js/factory.js ***!
+  \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34216,11 +34327,15 @@ this["dash_composed"] =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	exports.default = plotComponentFactory;
+	
 	var _react = __webpack_require__(/*! react */ 2);
 	
-	var React = _interopRequireDefault(_react).default;
+	var _react2 = _interopRequireDefault(_react);
 	
-	var Component = _react.Component;
+	var _propTypes = __webpack_require__(/*! prop-types */ 3);
+	
+	var _propTypes2 = _interopRequireDefault(_propTypes);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -34230,69 +34345,247 @@ this["dash_composed"] =
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var errorBoundary = function errorBoundary(Element, errorCallback) {
-	  return function (_React$Component) {
-	    _inherits(ErrorBoundary, _React$Component);
+	// The naming convention is:
+	//   - events are attached as `'plotly_' + eventName.toLowerCase()`
+	//   - react props are `'on' + eventName`
+	var eventNames = ['AfterExport', 'AfterPlot', 'Animated', 'AnimatingFrame', 'AnimationInterrupted', 'AutoSize', 'BeforeExport', 'ButtonClicked', 'Click', 'ClickAnnotation', 'Deselect', 'DoubleClick', 'Framework', 'Hover', 'LegendClick', 'LegendDoubleClick', 'Relayout', 'Restyle', 'Redraw', 'Selected', 'Selecting', 'SliderChange', 'SliderEnd', 'SliderStart', 'Transitioning', 'TransitionInterrupted', 'Unhover'];
 	
-	    function ErrorBoundary() {
-	      _classCallCheck(this, ErrorBoundary);
+	var updateEvents = ['plotly_restyle', 'plotly_redraw', 'plotly_relayout', 'plotly_doubleclick', 'plotly_animated'];
 	
-	      return _possibleConstructorReturn(this, (ErrorBoundary.__proto__ || Object.getPrototypeOf(ErrorBoundary)).apply(this, arguments));
+	// Check if a window is available since SSR (server-side rendering)
+	// breaks unnecessarily if you try to use it server-side.
+	var isBrowser = typeof window !== 'undefined';
+	
+	function plotComponentFactory(Plotly) {
+	  var PlotlyComponent = function (_Component) {
+	    _inherits(PlotlyComponent, _Component);
+	
+	    function PlotlyComponent(props) {
+	      _classCallCheck(this, PlotlyComponent);
+	
+	      var _this = _possibleConstructorReturn(this, (PlotlyComponent.__proto__ || Object.getPrototypeOf(PlotlyComponent)).call(this, props));
+	
+	      _this.p = Promise.resolve();
+	      _this.resizeHandler = null;
+	      _this.handlers = {};
+	
+	      _this.syncWindowResize = _this.syncWindowResize.bind(_this);
+	      _this.syncEventHandlers = _this.syncEventHandlers.bind(_this);
+	      _this.attachUpdateEvents = _this.attachUpdateEvents.bind(_this);
+	      _this.getRef = _this.getRef.bind(_this);
+	      _this.handleUpdate = _this.handleUpdate.bind(_this);
+	      _this.figureCallback = _this.figureCallback.bind(_this);
+	      return _this;
 	    }
 	
-	    _createClass(ErrorBoundary, [{
-	      key: 'componentDidCatch',
-	      value: function componentDidCatch(error) {
-	        errorCallback(error);
+	    _createClass(PlotlyComponent, [{
+	      key: 'componentDidMount',
+	      value: function componentDidMount() {
+	        var _this2 = this;
+	
+	        this.p = this.p.then(function () {
+	          return Plotly.newPlot(_this2.el, {
+	            data: _this2.props.data,
+	            layout: _this2.props.layout,
+	            config: _this2.props.config,
+	            frames: _this2.props.frames
+	          });
+	        }).then(function () {
+	          return _this2.syncWindowResize(null, true);
+	        }).then(this.syncEventHandlers).then(this.attachUpdateEvents).then(function () {
+	          return _this2.figureCallback(_this2.props.onInitialized);
+	        }).catch(function (err) {
+	          console.error('Error while plotting:', err);
+	          return _this2.props.onError && _this2.props.onError(err);
+	        });
+	      }
+	    }, {
+	      key: 'componentWillUpdate',
+	      value: function componentWillUpdate(nextProps) {
+	        var _this3 = this;
+	
+	        if (nextProps.revision !== void 0 && nextProps.revision === this.props.revision) {
+	          // if revision is set and unchanged, do nothing
+	          return;
+	        }
+	
+	        var numPrevFrames = this.props.frames && this.props.frames.length ? this.props.frames.length : 0;
+	        var numNextFrames = nextProps.frames && nextProps.frames.length ? nextProps.frames.length : 0;
+	        if (nextProps.layout === this.props.layout && nextProps.data === this.props.data && nextProps.config === this.props.config && numNextFrames === numPrevFrames) {
+	          // prevent infinite loops when component is re-rendered after onUpdate
+	          // frames *always* changes identity so fall back to check length only :(
+	          return;
+	        }
+	
+	        this.p = this.p.then(function () {
+	          return Plotly.react(_this3.el, {
+	            data: nextProps.data,
+	            layout: nextProps.layout,
+	            config: nextProps.config,
+	            frames: nextProps.frames
+	          });
+	        }).then(function () {
+	          return _this3.syncEventHandlers(nextProps);
+	        }).then(function () {
+	          return _this3.syncWindowResize(nextProps);
+	        }).then(function () {
+	          return _this3.figureCallback(nextProps.onUpdate);
+	        }).catch(function (err) {
+	          console.error('Error while plotting:', err);
+	          _this3.props.onError && _this3.props.onError(err);
+	        });
+	      }
+	    }, {
+	      key: 'componentWillUnmount',
+	      value: function componentWillUnmount() {
+	        this.figureCallback(this.props.onPurge);
+	
+	        if (this.resizeHandler && isBrowser) {
+	          window.removeEventListener('resize', this.resizeHandler);
+	          this.resizeHandler = null;
+	        }
+	
+	        this.removeUpdateEvents();
+	
+	        Plotly.purge(this.el);
+	      }
+	    }, {
+	      key: 'attachUpdateEvents',
+	      value: function attachUpdateEvents() {
+	        if (!this.el || !this.el.removeListener) return;
+	
+	        for (var i = 0; i < updateEvents.length; i++) {
+	          this.el.on(updateEvents[i], this.handleUpdate);
+	        }
+	      }
+	    }, {
+	      key: 'removeUpdateEvents',
+	      value: function removeUpdateEvents() {
+	        if (!this.el || !this.el.removeListener) return;
+	
+	        for (var i = 0; i < updateEvents.length; i++) {
+	          this.el.removeListener(updateEvents[i], this.handleUpdate);
+	        }
+	      }
+	    }, {
+	      key: 'handleUpdate',
+	      value: function handleUpdate() {
+	        this.figureCallback(this.props.onUpdate);
+	      }
+	    }, {
+	      key: 'figureCallback',
+	      value: function figureCallback(callback) {
+	        if (typeof callback === 'function') {
+	          var _el = this.el,
+	              data = _el.data,
+	              layout = _el.layout;
+	
+	          var frames = this.el._transitionData ? this.el._transitionData._frames : null;
+	          var figure = { data: data, layout: layout, frames: frames }; // for extra clarity!
+	          callback(figure, this.el);
+	        }
+	      }
+	    }, {
+	      key: 'syncWindowResize',
+	      value: function syncWindowResize(propsIn, invoke) {
+	        var _this4 = this;
+	
+	        var props = propsIn || this.props;
+	        if (!isBrowser) return;
+	
+	        if (props.useResizeHandler && !this.resizeHandler) {
+	          this.resizeHandler = function () {
+	            return Plotly.Plots.resize(_this4.el);
+	          };
+	          window.addEventListener('resize', this.resizeHandler);
+	          if (invoke) {
+	            this.resizeHandler();
+	          }
+	        } else if (!props.useResizeHandler && this.resizeHandler) {
+	          window.removeEventListener('resize', this.resizeHandler);
+	          this.resizeHandler = null;
+	        }
+	      }
+	    }, {
+	      key: 'getRef',
+	      value: function getRef(el) {
+	        this.el = el;
+	
+	        if (this.props.debug && isBrowser) {
+	          window.gd = this.el;
+	        }
+	      }
+	
+	      // Attach and remove event handlers as they're added or removed from props:
+	
+	    }, {
+	      key: 'syncEventHandlers',
+	      value: function syncEventHandlers(propsIn) {
+	        // Allow use of nextProps if passed explicitly:
+	        var props = propsIn || this.props;
+	
+	        for (var i = 0; i < eventNames.length; i++) {
+	          var eventName = eventNames[i];
+	          var prop = props['on' + eventName];
+	          var hasHandler = !!this.handlers[eventName];
+	
+	          if (prop && !hasHandler) {
+	            this.handlers[eventName] = prop;
+	            this.el.on('plotly_' + eventName.toLowerCase(), this.handlers[eventName]);
+	          } else if (!prop && hasHandler) {
+	            // Needs to be removed:
+	            this.el.removeListener('plotly_' + eventName.toLowerCase(), this.handlers[eventName]);
+	            delete this.handlers[eventName];
+	          }
+	        }
 	      }
 	    }, {
 	      key: 'render',
 	      value: function render() {
-	        return typeof Element === 'function' ? React.createElement(Element, this.props) : Element;
+	        return _react2.default.createElement('div', {
+	          id: this.props.divId,
+	          style: this.props.style,
+	          ref: this.getRef,
+	          className: this.props.className
+	        });
 	      }
 	    }]);
 	
-	    return ErrorBoundary;
-	  }(React.Component);
-	};
+	    return PlotlyComponent;
+	  }(_react.Component);
 	
-	exports.default = errorBoundary;
-
-/***/ },
-/* 343 */
-/*!*******************************!*\
-  !*** ./transpile/evalCode.js ***!
-  \*******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
+	  PlotlyComponent.propTypes = {
+	    data: _propTypes2.default.arrayOf(_propTypes2.default.object),
+	    config: _propTypes2.default.object,
+	    layout: _propTypes2.default.object,
+	    frames: _propTypes2.default.arrayOf(_propTypes2.default.object),
+	    revision: _propTypes2.default.number,
+	    onInitialized: _propTypes2.default.func,
+	    onPurge: _propTypes2.default.func,
+	    onError: _propTypes2.default.func,
+	    onUpdate: _propTypes2.default.func,
+	    debug: _propTypes2.default.bool,
+	    style: _propTypes2.default.object,
+	    className: _propTypes2.default.string,
+	    useResizeHandler: _propTypes2.default.bool,
+	    divId: _propTypes2.default.string
+	  };
 	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
+	  for (var i = 0; i < eventNames.length; i++) {
+	    PlotlyComponent.propTypes['on' + eventNames[i]] = _propTypes2.default.func;
+	  }
 	
-	var _react = __webpack_require__(/*! react */ 2);
+	  PlotlyComponent.defaultProps = {
+	    debug: false,
+	    useResizeHandler: false,
+	    data: [],
+	    style: { position: 'relative', display: 'inline-block' }
+	  };
 	
-	var React = _interopRequireDefault(_react).default;
-	
-	var _transform = __webpack_require__(/*! ./transform */ 13);
-	
-	var _poly = _transform._poly;
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-	
-	var evalCode = function evalCode(code, scope) {
-	  var scopeKeys = Object.keys(scope);
-	  var scopeValues = scopeKeys.map(function (key) {
-	    return scope[key];
-	  });
-	  var res = new (Function.prototype.bind.apply(Function, [null].concat(['_poly', 'React'], _toConsumableArray(scopeKeys), [code])))();
-	  return res.apply(undefined, [_poly, React].concat(_toConsumableArray(scopeValues)));
-	};
-	
-	exports.default = evalCode;
+	  return PlotlyComponent;
+	}
+	module.exports = exports['default'];
+	//# sourceMappingURL=factory.js.map
 
 /***/ }
 /******/ ]);

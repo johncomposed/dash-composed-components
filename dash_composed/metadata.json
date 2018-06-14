@@ -49,6 +49,18 @@
           }
         ],
         "returns": null
+      },
+      {
+        "name": "fireEvent",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "eventobj",
+            "type": null
+          }
+        ],
+        "returns": null
       }
     ],
     "props": {
@@ -68,8 +80,7 @@
       },
       "scope": {
         "type": {
-          "name": "custom",
-          "raw": "PropTypes.obj"
+          "name": "object"
         },
         "required": false,
         "description": "",
@@ -102,8 +113,7 @@
       },
       "containerProps": {
         "type": {
-          "name": "custom",
-          "raw": "PropTypes.obj"
+          "name": "object"
         },
         "required": false,
         "description": "",
@@ -114,8 +124,7 @@
       },
       "elementProps": {
         "type": {
-          "name": "custom",
-          "raw": "PropTypes.obj"
+          "name": "object"
         },
         "required": false,
         "description": "",
@@ -213,6 +222,342 @@
           "value": "\"\"",
           "computed": false
         }
+      },
+      "fireEvent": {
+        "type": {
+          "name": "func"
+        },
+        "required": false,
+        "description": "Dash-assigned callback that gets fired when the input changes."
+      },
+      "dashEvents": {
+        "type": {
+          "name": "enum",
+          "value": [
+            {
+              "value": "'onCopy'",
+              "computed": false
+            },
+            {
+              "value": "'onCut'",
+              "computed": false
+            },
+            {
+              "value": "'onPaste'",
+              "computed": false
+            },
+            {
+              "value": "'onCompositionEnd'",
+              "computed": false
+            },
+            {
+              "value": "'onCompositionStart'",
+              "computed": false
+            },
+            {
+              "value": "'onCompositionUpdate'",
+              "computed": false
+            },
+            {
+              "value": "'onKeyDown'",
+              "computed": false
+            },
+            {
+              "value": "'onKeyPress'",
+              "computed": false
+            },
+            {
+              "value": "'onKeyUp'",
+              "computed": false
+            },
+            {
+              "value": "'onFocus'",
+              "computed": false
+            },
+            {
+              "value": "'onBlur'",
+              "computed": false
+            },
+            {
+              "value": "'onChange'",
+              "computed": false
+            },
+            {
+              "value": "'onInput'",
+              "computed": false
+            },
+            {
+              "value": "'onInvalid'",
+              "computed": false
+            },
+            {
+              "value": "'onSubmit'",
+              "computed": false
+            },
+            {
+              "value": "'onClick'",
+              "computed": false
+            },
+            {
+              "value": "'onContextMenu'",
+              "computed": false
+            },
+            {
+              "value": "'onDoubleClick'",
+              "computed": false
+            },
+            {
+              "value": "'onDrag'",
+              "computed": false
+            },
+            {
+              "value": "'onDragEnd'",
+              "computed": false
+            },
+            {
+              "value": "'onDragEnter'",
+              "computed": false
+            },
+            {
+              "value": "'onDragExit'",
+              "computed": false
+            },
+            {
+              "value": "'onDragLeave'",
+              "computed": false
+            },
+            {
+              "value": "'onDragOver'",
+              "computed": false
+            },
+            {
+              "value": "'onDragStart'",
+              "computed": false
+            },
+            {
+              "value": "'onDrop'",
+              "computed": false
+            },
+            {
+              "value": "'onMouseDown'",
+              "computed": false
+            },
+            {
+              "value": "'onMouseEnter'",
+              "computed": false
+            },
+            {
+              "value": "'onMouseLeave'",
+              "computed": false
+            },
+            {
+              "value": "'onMouseMove'",
+              "computed": false
+            },
+            {
+              "value": "'onMouseOut'",
+              "computed": false
+            },
+            {
+              "value": "'onMouseOver'",
+              "computed": false
+            },
+            {
+              "value": "'onMouseUp'",
+              "computed": false
+            },
+            {
+              "value": "'onPointerDown'",
+              "computed": false
+            },
+            {
+              "value": "'onPointerMove'",
+              "computed": false
+            },
+            {
+              "value": "'onPointerUp'",
+              "computed": false
+            },
+            {
+              "value": "'onPointerCancel'",
+              "computed": false
+            },
+            {
+              "value": "'onGotPointerCapture'",
+              "computed": false
+            },
+            {
+              "value": "'onLostPointerCapture'",
+              "computed": false
+            },
+            {
+              "value": "'onPointerEnter'",
+              "computed": false
+            },
+            {
+              "value": "'onPointerLeave'",
+              "computed": false
+            },
+            {
+              "value": "'onPointerOver'",
+              "computed": false
+            },
+            {
+              "value": "'onPointerOut'",
+              "computed": false
+            },
+            {
+              "value": "'onSelect'",
+              "computed": false
+            },
+            {
+              "value": "'onTouchCancel'",
+              "computed": false
+            },
+            {
+              "value": "'onTouchEnd'",
+              "computed": false
+            },
+            {
+              "value": "'onTouchMove'",
+              "computed": false
+            },
+            {
+              "value": "'onTouchStart'",
+              "computed": false
+            },
+            {
+              "value": "'onScroll'",
+              "computed": false
+            },
+            {
+              "value": "'onAbort'",
+              "computed": false
+            },
+            {
+              "value": "'onCanPlay'",
+              "computed": false
+            },
+            {
+              "value": "'onCanPlayThrough'",
+              "computed": false
+            },
+            {
+              "value": "'onDurationChange'",
+              "computed": false
+            },
+            {
+              "value": "'onEmptied'",
+              "computed": false
+            },
+            {
+              "value": "'onEncrypted'",
+              "computed": false
+            },
+            {
+              "value": "'onEnded'",
+              "computed": false
+            },
+            {
+              "value": "'onError'",
+              "computed": false
+            },
+            {
+              "value": "'onLoadedData'",
+              "computed": false
+            },
+            {
+              "value": "'onLoadedMetadata'",
+              "computed": false
+            },
+            {
+              "value": "'onLoadStart'",
+              "computed": false
+            },
+            {
+              "value": "'onPause'",
+              "computed": false
+            },
+            {
+              "value": "'onPlay'",
+              "computed": false
+            },
+            {
+              "value": "'onPlaying'",
+              "computed": false
+            },
+            {
+              "value": "'onProgress'",
+              "computed": false
+            },
+            {
+              "value": "'onRateChange'",
+              "computed": false
+            },
+            {
+              "value": "'onSeeked'",
+              "computed": false
+            },
+            {
+              "value": "'onSeeking'",
+              "computed": false
+            },
+            {
+              "value": "'onStalled'",
+              "computed": false
+            },
+            {
+              "value": "'onSuspend'",
+              "computed": false
+            },
+            {
+              "value": "'onTimeUpdate'",
+              "computed": false
+            },
+            {
+              "value": "'onVolumeChange'",
+              "computed": false
+            },
+            {
+              "value": "'onWaiting'",
+              "computed": false
+            },
+            {
+              "value": "'onWheel'",
+              "computed": false
+            },
+            {
+              "value": "'onLoad'",
+              "computed": false
+            },
+            {
+              "value": "'onError'",
+              "computed": false
+            },
+            {
+              "value": "'onAnimationStart'",
+              "computed": false
+            },
+            {
+              "value": "'onAnimationEnd'",
+              "computed": false
+            },
+            {
+              "value": "'onAnimationIteration'",
+              "computed": false
+            },
+            {
+              "value": "'onTransitionEnd'",
+              "computed": false
+            },
+            {
+              "value": "'onToggle'",
+              "computed": false
+            }
+          ]
+        },
+        "required": false,
+        "description": ""
       }
     }
   }

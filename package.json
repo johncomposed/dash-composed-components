@@ -1,6 +1,6 @@
 {
   "name": "dash-composed",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Dash UI component suite",
   "main": "lib/index.js",
   "repository": {
@@ -16,7 +16,7 @@
     "clean-lib": "mkdirp lib && rimraf lib/*",
     "copy-lib": "copyfiles -e \"__init__.py\" -u 1 \"lib/*\" dash_composed",
     "demo": "webpack-dev-server --hot --inline --port=9000 --content-base demo --config=webpack/webpack.config.demo.js",
-    "demo-python": "run-p webpack-python python",
+    "demo-python": "run-p webpack-python python serve-demo",
     "build": "npm run build-dist && npm run copy-lib",
     "publish-pypi": "npm run build && python setup.py sdist upload",
     "build-dev": "run-s clean-lib extract-metadata webpack-dev",
@@ -27,7 +27,8 @@
     "uninstall-local": "pip3 uninstall dash_composed -y",
     "webpack-dev": "webpack --config=webpack/webpack.config.dev.js",
     "webpack-dist": "webpack --config=webpack/webpack.config.dist.js",
-    "webpack-python": "webpack --config=webpack/webpack.config.python.js -w"
+    "webpack-python": "webpack --config=webpack/webpack.config.python.js -w",
+    "serve-demo": "serve -s dash_composed -p 5001"
   },
   "dependencies": {
     "babel-plugin-transform-es2015-modules-commonjs-simple": "^6.7.4",
@@ -52,7 +53,9 @@
     "mkdirp": "^0.5.1",
     "npm-run-all": "^4.1.3",
     "react-docgen": "^2.20.1",
+    "react-plotly.js": "^2.2.0",
     "rimraf": "^2.6.1",
+    "serve": "^6.0.6",
     "webpack": "^1.13.1",
     "webpack-partial": "^1.2.0",
     "webpack-shell-plugin": "^0.5.0"
