@@ -12,7 +12,9 @@ app.config['suppress_callback_exceptions'] = True
 app.scripts.append_script({
     "external_url": [
         "https://cdnjs.cloudflare.com/ajax/libs/ramda/0.25.0/ramda.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.js"
+        "https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.js",
+        "https://unpkg.com/moment/min/moment.min.js",
+        "https://unpkg.com/antd/dist/antd.js"
     ]
 })
 
@@ -22,6 +24,7 @@ require = lambda jsfile: Path(path.relpath(jsfile)).read_text()
 
 DygraphCode = require('./demo-components/Dygraph.js')
 PlotHover = require('./demo-components/Plotly-Hover.js')
+AntRadio = require('./demo-components/Ant-Radio.js')
 
 
 RelayoutCode = """
@@ -102,12 +105,19 @@ options = {
     "style": {"width": "100%"}
 }
 
+antoptions = {"a": "Shanghai", "b": "Beijing", "c": "Chengdu"}
 # Layout
 app.layout = html.Div([
     html.Link(rel="stylesheet", href="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css"),
+    html.Link(rel="stylesheet", href="//unpkg.com/antd/dist/antd.css"),
     html.Div([
         dash_composed.ReactComponent(id="zero", code=InputComponent, value='wowza'),
-        html.Pre(id='zero-store', style={'overflowY': 'scroll', 'maxHeight': '400px'})
+        html.Pre(id='zero-store', style={'overflowY': 'scroll', 'textAlign': 'center', 'maxHeight': '400px'})
+    ]),
+
+    html.Div([
+        dash_composed.ReactComponent(id="antradio", code=AntRadio, noInline=True, value='a', options=antoptions),
+        html.Pre(id='antradio-result', style={'overflowY': 'scroll', 'textAlign': 'center', 'maxHeight': '400px'})
     ]),
 
     dash_composed.ReactComponent(id="dygraph", code=DygraphCode, noInline=True,
@@ -125,7 +135,7 @@ app.layout = html.Div([
         label='my-label'
     ),
     html.Div(id='output')
-])
+], style=dict(paddingBottom = 100))
 
 
 
@@ -150,13 +160,18 @@ def display_output1(value):
 def display_output2(value):
     return 'You have entered {}'.format(value)
 
-
-
 @app.callback(
     dash.dependencies.Output('relayout', 'layout'),
     [dash.dependencies.Input('input', 'value')])
 def myfun(x):
     return {'title': x}
+    
+@app.callback(
+    dash.dependencies.Output('antradio-result', 'children'),
+    [dash.dependencies.Input('antradio', 'value')])
+def radio_value(value):
+    return value
+    
 
 if __name__ == '__main__':
     app.run_server(debug=True)
