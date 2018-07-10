@@ -1192,7 +1192,8 @@ this["dash_composed"] =
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Plotly = createPlotlyComponent(window.Plotly);
+	// const Plot = createPlotlyComponent(window.Plotly);
+	
 	
 	var basicType = PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.bool, PropTypes.object, PropTypes.array]);
 	
@@ -1223,7 +1224,9 @@ this["dash_composed"] =
 	          noInline = _props.noInline;
 	
 	
-	      scope['Plotly'] = Plotly;
+	      scope['createPlotlyComponent'] = createPlotlyComponent;
+	      // scope['Plot'] = Plot;
+	
 	      // Transpilation arguments
 	      var input = { code: code, scope: scope };
 	
@@ -1309,7 +1312,7 @@ this["dash_composed"] =
 	        El,
 	        _extends({ id: id }, containerProps),
 	        Element && React.createElement(Element, _extends({}, elementProps, {
-	          options: options, layout: layout, data: data, data2: data2, value: value, value2: value2, setProps: setProps, fireEvent: fireEvent
+	          id: id, options: options, layout: layout, data: data, data2: data2, value: value, value2: value2, setProps: setProps, fireEvent: fireEvent
 	        }))
 	      );
 	    }

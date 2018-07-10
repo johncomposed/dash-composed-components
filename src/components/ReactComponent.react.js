@@ -4,7 +4,7 @@ import { generateElement, renderElementAsync } from '../transpile'
 import {all, equals, omit, without} from 'ramda'
 
 import createPlotlyComponent from 'react-plotly.js/factory';
-const Plotly = createPlotlyComponent(window.Plotly);
+// const Plot = createPlotlyComponent(window.Plotly);
 
 
 const basicType = PropTypes.oneOfType([
@@ -102,7 +102,9 @@ export default class ReactComponent extends Component {
     componentDidMount() {
       const { code, scope, noInline } = this.props;
       
-      scope['Plotly'] = Plotly;
+      scope['createPlotlyComponent'] = createPlotlyComponent;
+      // scope['Plot'] = Plot;
+      
       // Transpilation arguments
       const input = { code, scope }
       
@@ -172,7 +174,7 @@ export default class ReactComponent extends Component {
       return (
           <El id={id} {...containerProps}>{
             Element && <Element {...elementProps} {...{
-              options, layout, data, data2, value, value2, setProps, fireEvent
+              id, options, layout, data, data2, value, value2, setProps, fireEvent
             }} />
           }</El>
       );
