@@ -223,6 +223,13 @@
           "computed": false
         }
       },
+      "children": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
       "fireEvent": {
         "type": {
           "name": "func"

@@ -11,6 +11,7 @@ class PlotlyHover extends React.Component {
       points: undefined,
       realX: 0,
       realY: 0,
+      relayoutData: {}
     }
     
     this.handleHover = this.handleHover.bind(this);
@@ -95,7 +96,7 @@ class PlotlyHover extends React.Component {
           spikemode: 'toaxis+across',
           showspikes: true,
           spikesnap: 'cursor',
-
+          range: Object.values(this.state.relayoutData),
         },
         yaxis: {
           // range: [0, 8]
@@ -112,7 +113,7 @@ class PlotlyHover extends React.Component {
             useResizeHandler={true}
             layout={fakelayout}
             config={{displayModeBar: false}}
-            
+            onRelayout={((relayoutData) => this.setState({relayoutData}))}
             onHover={(e) => this.handleHover(e)}
             onUnhover={(e) => this.handleUnhover(e)}
           />

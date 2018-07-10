@@ -18,6 +18,14 @@ app.scripts.append_script({
     ]
 })
 
+app.css.append_css({
+    "external_url": [
+        "//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css",
+        "//unpkg.com/antd/dist/antd.css",
+    ]
+})
+
+
 from os import path
 from pathlib import Path
 require = lambda jsfile: Path(path.relpath(jsfile)).read_text()
@@ -83,6 +91,20 @@ InputComponent = """
     }
 """
 
+RowComponent = """
+    class RowComp extends React.Component {
+        render() {
+            const { Row } = window.antd;
+            const {children, options} = this.props
+            console.log('rowrow', children)
+            return (
+                <Row {...options}> {children} </Row>
+            )
+        }
+    }
+"""
+
+
 # Data
 import pandas as pd
 import numpy as np
@@ -108,8 +130,10 @@ options = {
 antoptions = {"a": "Shanghai", "b": "Beijing", "c": "Chengdu"}
 # Layout
 app.layout = html.Div([
-    html.Link(rel="stylesheet", href="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css"),
-    html.Link(rel="stylesheet", href="//unpkg.com/antd/dist/antd.css"),
+    dash_composed.ReactComponent(id="row1", code=RowComponent, children=[
+        html.H1('Test!')
+    ]),
+    
     html.Div([
         dash_composed.ReactComponent(id="zero", code=InputComponent, value='wowza'),
         html.Pre(id='zero-store', style={'overflowY': 'scroll', 'textAlign': 'center', 'maxHeight': '400px'})

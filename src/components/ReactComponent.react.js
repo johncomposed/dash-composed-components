@@ -39,6 +39,10 @@ const reactEvents = [
   'onTransitionEnd',
   'onToggle'
 ]
+const NodeProps =PropTypes.oneOfType([
+  PropTypes.arrayOf(PropTypes.node),
+  PropTypes.node
+])
 
 export default class ReactComponent extends Component {
     static propTypes = {
@@ -66,7 +70,7 @@ export default class ReactComponent extends Component {
         data2: basicType,
         value: basicType,
         value2: basicType,
-
+        children: PropTypes.any, //NodeProps,
         /**
          * Dash-assigned callback that gets fired when the input changes.
          */
@@ -132,7 +136,7 @@ export default class ReactComponent extends Component {
       const isPropEqual = key => equals(this.props[key], nextProps[key])
       const propsToCheck = without(this.props.ignoredProps, [
         // 'scope', 'code', 
-        "containerProps",  "elementProps", 
+        "containerProps",  "elementProps", "children",
         "options", "layout", "data", "data2", "value", "value2"
       ])
 
@@ -162,7 +166,7 @@ export default class ReactComponent extends Component {
       
       const { 
         id, containerEl, containerProps,
-        elementProps,
+        elementProps, children,
         options, layout, data, data2, value, value2
       } = this.props;
       const setProps = this.setProps
@@ -174,7 +178,7 @@ export default class ReactComponent extends Component {
       return (
           <El id={id} {...containerProps}>{
             Element && <Element {...elementProps} {...{
-              id, options, layout, data, data2, value, value2, setProps, fireEvent
+              id, options, layout, data, data2, value, value2, setProps, fireEvent, children
             }} />
           }</El>
       );
